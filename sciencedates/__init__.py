@@ -1,7 +1,7 @@
-from __future__ import division #needed for py2.7
+from __future__ import division
 from datetime import timedelta,datetime, time
 from pytz import UTC
-from numpy import atleast_1d, empty_like, atleast_2d,nan,empty,datetime64,ndarray,asarray
+from numpy import atleast_1d, empty_like, atleast_2d,nan,empty,datetime64,ndarray,asarray,absolute,asanyarray,nanargmin
 from dateutil.parser import parse
 
 def datetime2yd(T):
@@ -159,3 +159,54 @@ def datetime2yeardec(t):
     boy = datetime(year, 1, 1,tzinfo=UTC)
     eoy = datetime(year + 1, 1, 1, tzinfo=UTC)
     return year + ((t - boy).total_seconds() / ((eoy - boy).total_seconds()))
+
+
+
+def find_nearest(x,x0):
+    """
+    This find_nearest function does NOT assume sorted input
+
+    inputs:
+    x: array (float, int, datetime, h5py.Dataset) within which to search for x0
+    x0: singleton or array of values to search for in x
+
+    outputs:
+    idx: index of flattened x nearest to x0  (i.e. works with higher than 1-D arrays also)
+    xidx: x[idx]
+
+    Observe how bisect.bisect() gives the incorrect result!
+
+    idea based on:
+    http://stackoverflow.com/questions/2566412/find-nearest-value-in-numpy-array
+
+    """
+    x = asanyarray(x) #for indexing upon return
+    x0 = atleast_1d(x0)
+#%%
+    if x.size==0 or x0.size==0:
+        raise ValueError('empty input(s)')
+
+    assert x0.ndim in (0,1),'2-D x0 not handled yet'
+#%%
+    ind = empty_like(x0,dtype=int)
+
+    # NOTE: not trapping IndexError (all-nan) becaues returning None can surprise with slice indexing
+    for i,xi in enumerate(x0):
+        ind[i] = nanargmin(absolute(x-xi))
+
+    return ind.squeeze()[()], x[ind].squeeze()[()]   # [()] to pop scalar from 0d array while being OK with ndim>0
+
+def INCORRECTRESULT_using_bisect(x,X0): #pragma: no cover
+    X0 = atleast_1d(X0)
+    x.sort()
+    ind = [bisect(x,x0) for x0 in X0]
+
+    x = asanyarray(x)
+    return asanyarray(ind),x[ind]
+
+if __name__ == '__main__':
+    from bisect import bisect
+
+    print(find_nearest([10,15,12,20,14,33],[32,12.01]))
+
+    print(INCORRECTRESULT_using_bisect([10,15,12,20,14,33],[32,12.01]))
