@@ -1,7 +1,7 @@
 from __future__ import division #needed for py2.7
 from datetime import timedelta,datetime, time
 from pytz import UTC
-from numpy import atleast_1d, empty_like, atleast_2d,nan,empty,datetime64,ndarray,array
+from numpy import atleast_1d, empty_like, atleast_2d,nan,empty,datetime64,ndarray,asarray
 from dateutil.parser import parse
 
 def datetime2yd(T):
@@ -22,9 +22,9 @@ def datetime2yd(T):
         utsec[i] = dt2utsec(t)
         yd[i] = t.year*1000 + int(t.strftime('%j'))
 
-    return yd,utsec
+    return yd.squeeze()[()] , utsec.squeeze()[()]
 
-def yd2datetime(yd):
+def yd2datetime(yd,utsec=None):
     """
     Inputs:
     yd: yyyyddd four digit year, 3 digit day of year (INTEGER 7 digits)
@@ -37,7 +37,14 @@ def yd2datetime(yd):
     yd = str(yd)
     assert len(yd)==7,'yyyyddd expected'
 
-    return forceutc(datetime(int(yd[:4]), 1, 1) + timedelta(int(yd[4:]) - 1))
+    year = int(yd[:4])
+    assert 0 < year < 3000,'year not in expected format'
+
+    dt = forceutc(datetime(year, 1, 1) + timedelta(days=int(yd[4:]) - 1))
+    if utsec is not None:
+        dt += timedelta(seconds=utsec)
+
+    return dt
 
 
 def datetime2gtd(T,glon=nan):
@@ -92,7 +99,7 @@ def forceutc(t):
     elif isinstance(t,datetime):
         pass
     elif isinstance(t,(ndarray,list,tuple)):
-        return array([forceutc(T) for T in t])
+        return asarray([forceutc(T) for T in t])
     else:
         raise TypeError('datetime only input')
 #%% enforce UTC on datetime
@@ -143,7 +150,7 @@ def datetime2yeardec(t):
     """
     if isinstance(t,str):
         t = parse(t)
-        
+
     t = forceutc(t)
 
     assert isinstance(t,datetime)
