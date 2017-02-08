@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+from datetime import datetime
+from pytz import timezone, UTC
 from numpy.testing import run_module_suite,assert_allclose
 #
 import sciencedates as sd
@@ -7,7 +10,7 @@ def test_fortrandates():
     yeardec = sd.datetime2yeardec(adatetime)
     
     assert_allclose(yeardec,2013.5)
-    assert fortrandates.yeardec2datetime(yeardec) == adatetime
+    assert sd.yeardec2datetime(yeardec) == adatetime
 
 def test_utc():
     adatetime=datetime(2013,7,2,12,0,0)
@@ -25,4 +28,5 @@ def test_datetimefortran():
     assert_allclose(utsec[0],43200)
     assert_allclose(stl[0],14.8)
 
-run_module_suite()
+if __name__ == '__main__':
+    run_module_suite()

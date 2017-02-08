@@ -12,7 +12,7 @@ except Exception as e:
 setup(name='sciencedates',
       packages=['sciencedates'],
       version = '1.0',
-      description='Date conversions uses in the sciences.',
+      description='Date conversions used in the sciences.',
       author = 'Michael Hirsch, Ph.D.',
       url = 'https://github.com/scienceopen/sciencedates',
       classifiers=[
