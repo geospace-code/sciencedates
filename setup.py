@@ -1,17 +1,11 @@
 #!/usr/bin/env python
 from setuptools import setup
 
-try:
-    import conda.cli
-    conda.cli.main('install','--file','requirements.txt')
-except Exception as e:
-    print(e)
-    import pip
-    pip.main(['install','-r','requirements.txt'])
+req = ['nose','numpy','pytz','python-dateutil']
 
 setup(name='sciencedates',
       packages=['sciencedates'],
-      version = '1.1',
+      version = '1.1.1',
       description='Date conversions used in the sciences.',
       author = 'Michael Hirsch, Ph.D.',
       url = 'https://github.com/scienceopen/sciencedates',
@@ -25,5 +19,6 @@ setup(name='sciencedates',
       'Programming Language :: Python :: 3.5',
       'Programming Language :: Python :: 3.6',
       ],
+      install_requires=req
 	  )
 

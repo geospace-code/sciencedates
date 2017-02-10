@@ -2,12 +2,20 @@
     :target: https://travis-ci.org/scienceopen/sciencedates
 
 .. image:: https://coveralls.io/repos/github/scienceopen/sciencedates/badge.svg?branch=master
-:target: https://coveralls.io/github/scienceopen/sciencedates?branch=master
+    :target: https://coveralls.io/github/scienceopen/sciencedates?branch=master
 
 ============
 sciencedates
 ============
 Date conversions used in the sciences.
+
+.. contents::
+
+Install
+=======
+::
+
+    pip install sciencedates
 
 Examples
 ========
