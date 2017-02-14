@@ -3,6 +3,10 @@ from datetime import timedelta,datetime, time
 from pytz import UTC
 from numpy import atleast_1d, empty_like, atleast_2d,nan,empty,datetime64,ndarray,asarray,absolute,asanyarray,nanargmin
 from dateutil.parser import parse
+from xarray import DataArray
+
+from matplotlib.dates import DateFormatter
+from matplotlib.dates import MinuteLocator,SecondLocator
 
 def datetime2yd(T):
     """
@@ -161,7 +165,7 @@ def datetime2yeardec(t):
     return year + ((t - boy).total_seconds() / ((eoy - boy).total_seconds()))
 
 
-
+#%%
 def find_nearest(x,x0):
     """
     This find_nearest function does NOT assume sorted input
@@ -210,3 +214,40 @@ if __name__ == '__main__':
     print(find_nearest([10,15,12,20,14,33],[32,12.01]))
 
     print(INCORRECTRESULT_using_bisect([10,15,12,20,14,33],[32,12.01]))
+#%%
+
+def tickfix(t,fg,ax):
+    majtick,mintick = timeticks(t[-1] - t[0])
+    if majtick:
+        ax.xaxis.set_major_locator(majtick)
+    if mintick:
+        ax.xaxis.set_minor_locator(mintick)
+    ax.xaxis.set_major_formatter(DateFormatter('%H:%M:%S'))
+    fg.autofmt_xdate()
+    ax.set_xlabel('UTC')
+
+def timeticks(tdiff:timedelta):
+    """
+    NOTE do NOT use "interval" or ticks are misaligned!  use "bysecond" only!
+    """
+    if isinstance(tdiff,DataArray): #len==1
+        tdiff = timedelta(microseconds=tdiff.item()/1e3)
+    assert isinstance(tdiff,timedelta),'expecting datetime.timedelta'
+
+    if tdiff > timedelta(hours=2):
+        return None,None
+
+    elif tdiff > timedelta(minutes=20):
+        return MinuteLocator(byminute=range(0,60,5)),  MinuteLocator(byminute=range(0,60,1))
+
+    elif (timedelta(minutes=5) < tdiff) & (tdiff<=timedelta(minutes=20)):
+        return MinuteLocator(byminute=range(0,60,1)),  SecondLocator(bysecond=range(0,60,15))
+
+    elif (timedelta(minutes=1) < tdiff) & (tdiff<=timedelta(minutes=5)):
+        return SecondLocator(bysecond=range(0,60,15)), SecondLocator(bysecond=range(0,60,5))
+
+    elif (timedelta(seconds=30) < tdiff) &(tdiff<=timedelta(minutes=1)):
+        return SecondLocator(bysecond=range(0,60,5)),  SecondLocator(bysecond=range(0,60,2))
+
+    else:
+        return SecondLocator(bysecond=range(0,60,2)),  SecondLocator(bysecond=range(0,60,1))
