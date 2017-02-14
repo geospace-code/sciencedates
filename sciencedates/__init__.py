@@ -216,31 +216,38 @@ if __name__ == '__main__':
     print(INCORRECTRESULT_using_bisect([10,15,12,20,14,33],[32,12.01]))
 #%%
 
-def tickfix(t,fg,ax):
+def tickfix(t,fg,ax,tfmt='%H:%M:%S'):
     majtick,mintick = timeticks(t[-1] - t[0])
     if majtick:
         ax.xaxis.set_major_locator(majtick)
     if mintick:
         ax.xaxis.set_minor_locator(mintick)
-    ax.xaxis.set_major_formatter(DateFormatter('%H:%M:%S'))
+    ax.xaxis.set_major_formatter(DateFormatter(tfmt))
     fg.autofmt_xdate()
-    ax.set_xlabel('UTC')
 
-def timeticks(tdiff:timedelta):
+
+    ax.tick_params(axis='both',which='both')
+    ax.grid(True,which='both')
+
+def timeticks(tdiff):
     """
     NOTE do NOT use "interval" or ticks are misaligned!  use "bysecond" only!
     """
     if isinstance(tdiff,DataArray): #len==1
         tdiff = timedelta(microseconds=tdiff.item()/1e3)
+
     assert isinstance(tdiff,timedelta),'expecting datetime.timedelta'
 
     if tdiff > timedelta(hours=2):
         return None,None
 
     elif tdiff > timedelta(minutes=20):
-        return MinuteLocator(byminute=range(0,60,5)),  MinuteLocator(byminute=range(0,60,1))
+        return MinuteLocator(byminute=range(0,60,5)),  MinuteLocator(byminute=range(0,60,2))
 
-    elif (timedelta(minutes=5) < tdiff) & (tdiff<=timedelta(minutes=20)):
+    elif (timedelta(minutes=10) < tdiff) & (tdiff<=timedelta(minutes=20)):
+        return MinuteLocator(byminute=range(0,60,2)),  MinuteLocator(byminute=range(0,60,1))
+
+    elif (timedelta(minutes=5) < tdiff) & (tdiff<=timedelta(minutes=10)):
         return MinuteLocator(byminute=range(0,60,1)),  SecondLocator(bysecond=range(0,60,15))
 
     elif (timedelta(minutes=1) < tdiff) & (tdiff<=timedelta(minutes=5)):
