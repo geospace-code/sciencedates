@@ -225,9 +225,10 @@ def tickfix(t,fg,ax,tfmt='%H:%M:%S'):
     ax.xaxis.set_major_formatter(DateFormatter(tfmt))
     fg.autofmt_xdate()
 
+    ax.autoscale(True,'x',tight=True)
 
-    ax.tick_params(axis='both',which='both')
-    ax.grid(True,which='both')
+ #   ax.tick_params(axis='both',which='both')
+   # ax.grid(True,which='both')
 
 def timeticks(tdiff):
     """
@@ -248,13 +249,13 @@ def timeticks(tdiff):
         return MinuteLocator(byminute=range(0,60,2)),  MinuteLocator(byminute=range(0,60,1))
 
     elif (timedelta(minutes=5) < tdiff) & (tdiff<=timedelta(minutes=10)):
-        return MinuteLocator(byminute=range(0,60,1)),  SecondLocator(bysecond=range(0,60,15))
+        return MinuteLocator(byminute=range(0,60,1)),  SecondLocator(bysecond=range(0,60,30))
 
     elif (timedelta(minutes=1) < tdiff) & (tdiff<=timedelta(minutes=5)):
-        return SecondLocator(bysecond=range(0,60,15)), SecondLocator(bysecond=range(0,60,5))
+        return SecondLocator(bysecond=range(0,60,30)), SecondLocator(bysecond=range(0,60,10))
 
     elif (timedelta(seconds=30) < tdiff) &(tdiff<=timedelta(minutes=1)):
-        return SecondLocator(bysecond=range(0,60,5)),  SecondLocator(bysecond=range(0,60,2))
+        return SecondLocator(bysecond=range(0,60,10)),  SecondLocator(bysecond=range(0,60,2))
 
     else:
         return SecondLocator(bysecond=range(0,60,2)),  SecondLocator(bysecond=range(0,60,1))
