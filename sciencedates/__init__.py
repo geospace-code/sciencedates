@@ -1,10 +1,10 @@
 from __future__ import division
 from datetime import timedelta,datetime, time
 from pytz import UTC
-from numpy import atleast_1d, empty_like, atleast_2d,nan,empty,datetime64,ndarray,asarray,absolute,asanyarray,nanargmin
+from numpy import atleast_1d, empty_like, atleast_2d,nan,empty,datetime64,ndarray,asarray,absolute,asanyarray,nanargmin, isnan
 from dateutil.parser import parse
 from xarray import DataArray
-
+#
 from matplotlib.dates import DateFormatter
 from matplotlib.dates import MinuteLocator,SecondLocator
 
@@ -196,7 +196,10 @@ def find_nearest(x,x0):
 
     # NOTE: not trapping IndexError (all-nan) becaues returning None can surprise with slice indexing
     for i,xi in enumerate(x0):
-        ind[i] = nanargmin(absolute(x-xi))
+        if xi is None or isnan(xi):
+            raise ValueError('x0 must NOT be None or NaN to avoid surprising None return value')
+        else:
+            ind[i] = nanargmin(absolute(x-xi))
 
     return ind.squeeze()[()], x[ind].squeeze()[()]   # [()] to pop scalar from 0d array while being OK with ndim>0
 
