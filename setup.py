@@ -8,7 +8,7 @@ setup(name='sciencedates',
       version = '1.2.2',
       description='Date conversions used in the sciences.',
       author = 'Michael Hirsch, Ph.D.',
-      url = 'https://github.com/scienceopen/sciencedates',
+      url = 'https://github.com/scivision/sciencedates',
       classifiers=[
       'Intended Audience :: Science/Research',
       'Development Status :: 5 - Production/Stable',
