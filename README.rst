@@ -1,8 +1,8 @@
-.. image:: https://travis-ci.org/scienceopen/sciencedates.svg?branch=master
-    :target: https://travis-ci.org/scienceopen/sciencedates
+.. image:: https://travis-ci.org/scivision/sciencedates.svg?branch=master
+    :target: https://travis-ci.org/scivision/sciencedates
 
-.. image:: https://coveralls.io/repos/github/scienceopen/sciencedates/badge.svg?branch=master
-    :target: https://coveralls.io/github/scienceopen/sciencedates?branch=master
+.. image:: https://coveralls.io/repos/github/scivision/sciencedates/badge.svg?branch=master
+    :target: https://coveralls.io/github/scivision/sciencedates?branch=master
 
 ============
 sciencedates
