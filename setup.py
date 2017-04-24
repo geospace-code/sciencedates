@@ -1,7 +1,14 @@
 #!/usr/bin/env python
-from setuptools import setup
-
 req = ['nose','numpy','pytz','python-dateutil','xarray','matplotlib']
+# %%
+import pip
+try:
+    import conda.cli
+    conda.cli.main('install',*req)
+except Exception as e:    
+    pip.main(['install',*req])
+# %%
+from setuptools import setup
 
 setup(name='sciencedates',
       packages=['sciencedates'],
@@ -17,6 +24,5 @@ setup(name='sciencedates',
       'Programming Language :: Python :: 3.5',
       'Programming Language :: Python :: 3.6',
       ],
-      install_requires=req
 	  )
 
