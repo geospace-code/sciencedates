@@ -1,3 +1,5 @@
+.. image:: https://zenodo.org/badge/81351748.svg
+   :target: https://zenodo.org/badge/latestdoi/81351748
 .. image:: https://travis-ci.org/scivision/sciencedates.svg?branch=master
     :target: https://travis-ci.org/scivision/sciencedates
 
