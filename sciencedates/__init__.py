@@ -1,3 +1,4 @@
+from __future__ import division
 from datetime import timedelta,datetime, time
 from pytz import UTC
 from numpy import atleast_1d, empty_like, atleast_2d,nan,empty,datetime64,ndarray,asarray,absolute,asanyarray,nanargmin, isnan
