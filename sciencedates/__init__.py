@@ -1,7 +1,7 @@
 from __future__ import division
 from datetime import timedelta,datetime, time
 from pytz import UTC
-from numpy import atleast_1d, empty_like, atleast_2d,nan,empty,datetime64,ndarray,asarray,absolute,asanyarray,nanargmin, isnan
+import numpy as np
 from dateutil.parser import parse
 from xarray import DataArray
 #
@@ -18,10 +18,10 @@ def datetime2yd(T):
     utsec: seconds from midnight utc
     """
     T = forceutc(T)
-    T = atleast_1d(T)
+    T = np.atleast_1d(T)
 
-    utsec=empty_like(T,dtype=float)
-    yd = empty_like(T,dtype=int)
+    utsec= np.empty_like(T, float)
+    yd =   np.empty_like(T, int)
     for i,t in enumerate(T):
         utsec[i] = dt2utsec(t)
         yd[i] = t.year*1000 + int(t.strftime('%j'))
@@ -51,7 +51,7 @@ def yd2datetime(yd,utsec=None):
     return dt
 
 
-def datetime2gtd(T,glon=nan):
+def datetime2gtd(T, glon=np.nan):
     """
     Inputs:
     T: Numpy 1-D array of datetime.datetime OR string suitable for dateutil.parser.parse
@@ -62,10 +62,11 @@ def datetime2gtd(T,glon=nan):
     utsec: seconds from midnight utc
     stl: local solar time
     """
-    T = atleast_1d(T); glon=atleast_2d(glon)
-    iyd=empty_like(T,dtype=int)
-    utsec=empty_like(T,dtype=float)
-    stl = empty((T.size,glon.shape[0],glon.shape[1]))
+    T =   np.atleast_1d(T)
+    glon= np.atleast_2d(glon)
+    iyd=  np.empty_like(T, int)
+    utsec=np.empty_like(T, float)
+    stl = np.empty((T.size, glon.shape[0], glon.shape[1]))
 
     for i,t in enumerate(T):
         t = forceutc(t)
@@ -98,12 +99,12 @@ def forceutc(t):
 #%% polymorph to datetime
     if isinstance(t,str):
         t = parse(t)
-    elif isinstance(t,datetime64):
+    elif isinstance(t, np.datetime64):
         t=t.astype('M8[ms]').astype('O') #for Numpy 1.10 at least...
     elif isinstance(t,datetime):
         pass
-    elif isinstance(t,(ndarray,list,tuple)):
-        return asarray([forceutc(T) for T in t])
+    elif isinstance(t,(np.ndarray,list,tuple)):
+        return np.asarray([forceutc(T) for T in t])
     else:
         raise TypeError('datetime only input')
 #%% enforce UTC on datetime
@@ -184,32 +185,32 @@ def find_nearest(x,x0):
     http://stackoverflow.com/questions/2566412/find-nearest-value-in-numpy-array
 
     """
-    x = asanyarray(x) #for indexing upon return
-    x0 = atleast_1d(x0)
+    x =  np.asanyarray(x) #for indexing upon return
+    x0 = np.atleast_1d(x0)
 #%%
     if x.size==0 or x0.size==0:
         raise ValueError('empty input(s)')
 
     assert x0.ndim in (0,1),'2-D x0 not handled yet'
 #%%
-    ind = empty_like(x0,dtype=int)
+    ind = np.empty_like(x0,dtype=int)
 
     # NOTE: not trapping IndexError (all-nan) becaues returning None can surprise with slice indexing
     for i,xi in enumerate(x0):
-        if xi is None or isnan(xi):
-            raise ValueError('x0 must NOT be None or NaN to avoid surprising None return value')
+        if xi is not None and (isinstance(xi,datetime) or np.isfinite(xi)):
+            ind[i] = np.nanargmin(abs(x-xi))
         else:
-            ind[i] = nanargmin(absolute(x-xi))
+            raise ValueError('x0 must NOT be None or NaN to avoid surprising None return value')
 
     return ind.squeeze()[()], x[ind].squeeze()[()]   # [()] to pop scalar from 0d array while being OK with ndim>0
 
 def INCORRECTRESULT_using_bisect(x,X0): #pragma: no cover
-    X0 = atleast_1d(X0)
+    X0 = np.atleast_1d(X0)
     x.sort()
     ind = [bisect(x,x0) for x0 in X0]
 
-    x = asanyarray(x)
-    return asanyarray(ind),x[ind]
+    x = np.asanyarray(x)
+    return np.asanyarray(ind),x[ind]
 
 if __name__ == '__main__':
     from bisect import bisect

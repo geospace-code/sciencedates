@@ -15,9 +15,13 @@ Date conversions used in the sciences.
 
 Install
 =======
-::
+from PyPi::
 
     pip install sciencedates
+    
+or from this repo::
+
+    python setup.py develop
 
 Examples
 ========

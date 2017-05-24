@@ -12,7 +12,7 @@ from setuptools import setup
 
 setup(name='sciencedates',
       packages=['sciencedates'],
-      version = '1.2.4',
+      version = '1.2.5',
       description='Date conversions used in the sciences.',
       author = 'Michael Hirsch, Ph.D.',
       url = 'https://github.com/scivision/sciencedates',

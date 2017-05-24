@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from datetime import datetime
 from pytz import timezone, UTC
-from numpy.testing import run_module_suite,assert_allclose,assert_almost_equal
+from numpy.testing import run_module_suite,assert_allclose,assert_equal
 #
 import sciencedates as sd
 
@@ -36,12 +36,16 @@ def test_gtd():
     assert iyd[0]==183
     assert_allclose(utsec[0],43200)
     assert_allclose(stl[0],14.8)
-    
-    
+
+
 def test_findnearest():
     indf,xf = sd.find_nearest([10,15,12,20,14,33],[32,12.01])
-    assert_almost_equal(indf,[5,2])
-    assert_almost_equal(xf,[33.,12.])
+    assert_allclose(indf,[5,2])
+    assert_allclose(xf,[33.,12.])
+
+    indf,xf = sd.find_nearest((datetime(2012,1,1,12), datetime(2012,1,1,11)), datetime(2012,1,1,11,30))
+    assert_equal(indf,0)
+    assert_equal(xf,datetime(2012,1,1,12))
 
 if __name__ == '__main__':
     run_module_suite()
