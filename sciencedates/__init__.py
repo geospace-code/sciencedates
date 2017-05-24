@@ -3,7 +3,7 @@ from datetime import timedelta,datetime, time
 from pytz import UTC
 import numpy as np
 from dateutil.parser import parse
-from xarray import DataArray
+import xarray
 #
 from matplotlib.dates import DateFormatter
 from matplotlib.dates import MinuteLocator,SecondLocator
@@ -238,7 +238,7 @@ def timeticks(tdiff):
     """
     NOTE do NOT use "interval" or ticks are misaligned!  use "bysecond" only!
     """
-    if isinstance(tdiff,DataArray): #len==1
+    if isinstance(tdiff,xarray.DataArray): #len==1
         tdiff = timedelta(microseconds=tdiff.item()/1e3)
 
     assert isinstance(tdiff,timedelta),'expecting datetime.timedelta'
