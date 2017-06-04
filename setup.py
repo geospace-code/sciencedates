@@ -5,14 +5,14 @@ import pip
 try:
     import conda.cli
     conda.cli.main('install',*req)
-except ImportError:    
+except ImportError:
     pip.main(['install'] + req)
 # %%
 from setuptools import setup
 
 setup(name='sciencedates',
       packages=['sciencedates'],
-      version = '1.2.6',
+      version = '1.2.7',
       description='Date conversions used in the sciences.',
       author = 'Michael Hirsch, Ph.D.',
       url = 'https://github.com/scivision/sciencedates',

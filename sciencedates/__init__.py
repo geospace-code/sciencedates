@@ -239,7 +239,7 @@ def timeticks(tdiff):
     NOTE do NOT use "interval" or ticks are misaligned!  use "bysecond" only!
     """
     if isinstance(tdiff,xarray.DataArray): #len==1
-        tdiff = timedelta(microseconds=tdiff.item()/1e3)
+        tdiff = timedelta(seconds=tdiff.values/np.timedelta64(1,'s'))
 
     assert isinstance(tdiff,timedelta),'expecting datetime.timedelta'
 
