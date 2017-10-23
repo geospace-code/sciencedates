@@ -39,7 +39,8 @@ def yd2datetime(yd,utsec=None):
     http://stackoverflow.com/questions/2427555/python-question-year-and-day-of-year-to-date
     """
     yd = str(yd)
-    assert len(yd)==7,'yyyyddd expected'
+    if len(yd) != 7:
+        raise ValueError('yyyyddd expected')
 
     year = int(yd[:4])
     assert 0 < year < 3000,'year not in expected format'
@@ -191,7 +192,8 @@ def find_nearest(x,x0):
     if x.size==0 or x0.size==0:
         raise ValueError('empty input(s)')
 
-    assert x0.ndim in (0,1),'2-D x0 not handled yet'
+    if not x0.ndim in (0,1):
+        raise ValueError('2-D x0 not handled yet')
 #%%
     ind = np.empty_like(x0,dtype=int)
 
