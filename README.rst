@@ -17,15 +17,16 @@ Install
 =======
 from PyPi::
 
-    pip install sciencedates
+    pip install -q sciencedates
     
 or from this repo::
 
-    python setup.py develop
+    python setup.py -q develop
 
 Examples
 ========
-::
+
+.. code:: python
 
     from pytz import UTC
     from datetime import datetime
