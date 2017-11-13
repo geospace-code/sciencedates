@@ -20,13 +20,10 @@ Date conversions used in the sciences.
 
 Install
 =======
-from PyPi::
+::
 
-    pip install -q sciencedates
+    pip install -e .
     
-or from this repo::
-
-    python setup.py -q develop
 
 Examples
 ========

@@ -1,12 +1,6 @@
 #!/usr/bin/env python
-req = ['nose','numpy','pytz','python-dateutil','xarray','matplotlib']
-# %%
-import pip
-try:
-    import conda.cli
-    conda.cli.main('install',*req)
-except ImportError:
-    pip.main(['install'] + req)
+req = ['nose','numpy','pytz','python-dateutil', 'xarray','matplotlib']
+
 # %%
 from setuptools import setup
 
@@ -25,5 +19,6 @@ setup(name='sciencedates',
       'Programming Language :: Python :: 3',
       ],
       install_requires=req,
+      python_requires='>=2.7',
 	  )
 
