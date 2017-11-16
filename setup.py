@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 req = ['nose','numpy','pytz','python-dateutil', 'xarray','matplotlib']
-
 # %%
 from setuptools import setup
 
