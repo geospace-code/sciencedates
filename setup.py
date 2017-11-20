@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 req = ['nose','numpy','pytz','python-dateutil', 'xarray','matplotlib']
 # %%
-from setuptools import setup
+from setuptools import setup,find_packages
 
 setup(name='sciencedates',
-      packages=['sciencedates'],
+      packages=find_packages(),
       version = '1.2.7',
       description='Date conversions used in the sciences.',
       author = 'Michael Hirsch, Ph.D.',
