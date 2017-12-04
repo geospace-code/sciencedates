@@ -1,11 +1,12 @@
 #!/usr/bin/env python
-req = ['nose','numpy','pytz','python-dateutil', 'xarray','matplotlib']
+install_requires = ['numpy','pytz','python-dateutil']
+tests_require=['nose','coveralls']
 # %%
 from setuptools import setup,find_packages
 
 setup(name='sciencedates',
       packages=find_packages(),
-      version = '1.2.7',
+      version = '1.3.0',
       description='Date conversions used in the sciences.',
       author = 'Michael Hirsch, Ph.D.',
       url = 'https://github.com/scivision/sciencedates',
@@ -17,7 +18,10 @@ setup(name='sciencedates',
       'Programming Language :: Python',
       'Programming Language :: Python :: 3',
       ],
-      install_requires=req,
+      install_requires=install_requires,
       python_requires='>=2.7',
+      tests_require=tests_require,
+      extras_require={'tests':tests_require,
+                      'plot':['xarray','matplotlib']},
 	  )
 

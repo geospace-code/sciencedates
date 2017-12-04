@@ -47,5 +47,8 @@ def test_findnearest():
     assert_equal(indf,0)
     assert_equal(xf,datetime(2012,1,1,12))
 
+def test_randomdate():
+    assert sd.randomdate(2018).year == 2018
+
 if __name__ == '__main__':
     run_module_suite()

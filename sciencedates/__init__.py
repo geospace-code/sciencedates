@@ -1,12 +1,11 @@
 from __future__ import division
-from datetime import timedelta,datetime, time
+from datetime import datetime,date,timedelta,time
 from pytz import UTC
 import numpy as np
 from dateutil.parser import parse
-import xarray
-#
-from matplotlib.dates import DateFormatter
-from matplotlib.dates import MinuteLocator,SecondLocator
+import calendar
+import random
+
 
 def datetime2yd(T):
     """
@@ -27,6 +26,7 @@ def datetime2yd(T):
         yd[i] = t.year*1000 + int(t.strftime('%j'))
 
     return yd.squeeze()[()] , utsec.squeeze()[()]
+
 
 def yd2datetime(yd,utsec=None):
     """
@@ -50,6 +50,17 @@ def yd2datetime(yd,utsec=None):
         dt += timedelta(seconds=utsec)
 
     return dt
+
+
+def date2doy(t):
+    yd = str(datetime2yd(t)[0][0])
+
+    year = int(yd[:4])
+    doy  = int(yd[4:])
+
+    assert 0 < doy < 366   # yes, < 366 for leap year too. normal year 0..364.  Leap 0..365.
+
+    return doy, year
 
 
 def datetime2gtd(T, glon=np.nan):
@@ -79,6 +90,7 @@ def datetime2gtd(T, glon=np.nan):
 
     return iyd,utsec,stl
 
+
 #def dt2utsec(t: datetime) -> float:
 def dt2utsec(t):
     """
@@ -87,7 +99,7 @@ def dt2utsec(t):
     """
     t = forceutc(t)
 
-    return timedelta.total_seconds(t-datetime.combine(t.date(),time(0,tzinfo=UTC)))
+    return timedelta.total_seconds(t-datetime.combine(t.date(), time(0,tzinfo=UTC)))
 
 
 def forceutc(t):
@@ -206,6 +218,7 @@ def find_nearest(x,x0):
 
     return ind.squeeze()[()], x[ind].squeeze()[()]   # [()] to pop scalar from 0d array while being OK with ndim>0
 
+
 def INCORRECTRESULT_using_bisect(x,X0): #pragma: no cover
     X0 = np.atleast_1d(X0)
     x.sort()
@@ -220,48 +233,13 @@ if __name__ == '__main__':
     print(find_nearest([10,15,12,20,14,33],[32,12.01]))
 
     print(INCORRECTRESULT_using_bisect([10,15,12,20,14,33],[32,12.01]))
-#%%
 
-def tickfix(t,fg,ax,tfmt='%H:%M:%S'):
-    majtick,mintick = timeticks(t[-1] - t[0])
-    if majtick:
-        ax.xaxis.set_major_locator(majtick)
-    if mintick:
-        ax.xaxis.set_minor_locator(mintick)
-    ax.xaxis.set_major_formatter(DateFormatter(tfmt))
-    fg.autofmt_xdate()
 
-    ax.autoscale(True,'x',tight=True)
-
- #   ax.tick_params(axis='both',which='both')
-   # ax.grid(True,which='both')
-
-def timeticks(tdiff):
-    """
-    NOTE do NOT use "interval" or ticks are misaligned!  use "bysecond" only!
-    """
-    if isinstance(tdiff,xarray.DataArray): #len==1
-        tdiff = timedelta(seconds=tdiff.values/np.timedelta64(1,'s'))
-
-    assert isinstance(tdiff,timedelta),'expecting datetime.timedelta'
-
-    if tdiff > timedelta(hours=2):
-        return None,None
-
-    elif tdiff > timedelta(minutes=20):
-        return MinuteLocator(byminute=range(0,60,5)),  MinuteLocator(byminute=range(0,60,2))
-
-    elif (timedelta(minutes=10) < tdiff) & (tdiff<=timedelta(minutes=20)):
-        return MinuteLocator(byminute=range(0,60,2)),  MinuteLocator(byminute=range(0,60,1))
-
-    elif (timedelta(minutes=5) < tdiff) & (tdiff<=timedelta(minutes=10)):
-        return MinuteLocator(byminute=range(0,60,1)),  SecondLocator(bysecond=range(0,60,30))
-
-    elif (timedelta(minutes=1) < tdiff) & (tdiff<=timedelta(minutes=5)):
-        return SecondLocator(bysecond=range(0,60,30)), SecondLocator(bysecond=range(0,60,10))
-
-    elif (timedelta(seconds=30) < tdiff) &(tdiff<=timedelta(minutes=1)):
-        return SecondLocator(bysecond=range(0,60,10)),  SecondLocator(bysecond=range(0,60,2))
-
+#def randomdate(year:int) -> datetime:
+def randomdate(year):
+    if calendar.isleap(year):
+        doy = random.randrange(366)
     else:
-        return SecondLocator(bysecond=range(0,60,2)),  SecondLocator(bysecond=range(0,60,1))
+        doy = random.randrange(365)
+
+    return date(year, 1, 1) + timedelta(days=doy)
