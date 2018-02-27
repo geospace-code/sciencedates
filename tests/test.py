@@ -33,7 +33,7 @@ class BasicTest(unittest.TestCase):
 
 
         d0 = datetime.date(2013,7,2)
-        dut = sd.forceutc(d0)
+        assert sd.forceutc(d0) == d0
 
     def test_gtd(self):
         adatetime = datetime.datetime(2013,7,2,12,0,0)
