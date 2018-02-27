@@ -17,11 +17,11 @@ class BasicTest(unittest.TestCase):
         assert utsec==utsec2
 
     def test_yeardec(self):
-        adatetime = datetime.datetime(2013,7,2,12,0,0,tzinfo=UTC)
-        yeardec = sd.datetime2yeardec(adatetime)
+        t0 = datetime.datetime(2013,7,2,12,0,0,tzinfo=UTC)
+        yeardec = sd.datetime2yeardec(t0)
 
-        assert_allclose(yeardec,2013.5)
-        assert sd.yeardec2datetime(yeardec) == adatetime
+        assert_allclose(yeardec, 2013.5)
+        assert sd.yeardec2datetime(yeardec) == t0
 
     def test_utc(self):
         t0 = datetime.datetime(2013,7,2,12,0,0)
@@ -36,8 +36,8 @@ class BasicTest(unittest.TestCase):
         assert sd.forceutc(d0) == d0
 
     def test_gtd(self):
-        adatetime = datetime.datetime(2013,7,2,12,0,0)
-        iyd,utsec,stl= sd.datetime2gtd(adatetime,glon=42)
+        t0 = datetime.datetime(2013,7,2,12,0,0)
+        iyd,utsec,stl= sd.datetime2gtd(t0,glon=42)
 
         assert iyd[0]==183
         assert_allclose(utsec[0],43200)

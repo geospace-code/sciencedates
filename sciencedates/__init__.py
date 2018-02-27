@@ -169,8 +169,14 @@ def datetime2yeardec(t):
     time distances should be preserved: If bdate-adate=ddate-cdate then
     dt2t(bdate)-dt2t(adate) = dt2t(ddate)-dt2t(cdate)
     """
+
     if isinstance(t,str):
         t = parse(t)
+    elif isinstance(t, datetime.datetime):
+        pass
+    elif isinstance(t, datetime.date):
+        t = datetime.datetime.combine(t, datetime.time.min)
+
 
     t = forceutc(t)
 
@@ -179,6 +185,7 @@ def datetime2yeardec(t):
     year = t.year
     boy = datetime.datetime(year, 1, 1,tzinfo=UTC)
     eoy = datetime.datetime(year + 1, 1, 1, tzinfo=UTC)
+
     return year + ((t - boy).total_seconds() / ((eoy - boy).total_seconds()))
 
 
