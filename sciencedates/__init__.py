@@ -1,5 +1,5 @@
 from __future__ import division
-from datetime import datetime,date,timedelta,time
+import datetime
 from pytz import UTC
 import numpy as np
 from dateutil.parser import parse
@@ -45,9 +45,9 @@ def yd2datetime(yd,utsec=None):
     year = int(yd[:4])
     assert 0 < year < 3000,'year not in expected format'
 
-    dt = forceutc(datetime(year, 1, 1) + timedelta(days=int(yd[4:]) - 1))
+    dt = forceutc(datetime.datetime(year, 1, 1) + datetime.timedelta(days=int(yd[4:]) - 1))
     if utsec is not None:
-        dt += timedelta(seconds=utsec)
+        dt += datetime.timedelta(seconds=utsec)
 
     return dt
 
@@ -99,7 +99,7 @@ def dt2utsec(t):
     """
     t = forceutc(t)
 
-    return timedelta.total_seconds(t-datetime.combine(t.date(), time(0,tzinfo=UTC)))
+    return datetime.timedelta.total_seconds(t-datetime.datetime.combine(t.date(), datetime.time(0,tzinfo=UTC)))
 
 
 def forceutc(t):
@@ -114,17 +114,20 @@ def forceutc(t):
         t = parse(t)
     elif isinstance(t, np.datetime64):
         t=t.astype('M8[ms]').astype('O') #for Numpy 1.10 at least...
-    elif isinstance(t,datetime):
+    elif isinstance(t, datetime.datetime):
         pass
+    elif isinstance(t, datetime.date):
+        return t
     elif isinstance(t,(np.ndarray,list,tuple)):
         return np.asarray([forceutc(T) for T in t])
     else:
         raise TypeError('datetime only input')
 #%% enforce UTC on datetime
-    if t.tzinfo == None: #datetime-naive
+    if t.tzinfo is None: #datetime-naive
         t = t.replace(tzinfo = UTC)
     else: #datetime-aware
         t = t.astimezone(UTC) #changes timezone, preserving absolute time. E.g. noon EST = 5PM UTC
+
     return t
 
 
@@ -145,11 +148,11 @@ def yeardec2datetime(atime):
 
         year = int(atime)
         remainder = atime - year
-        boy = datetime(year, 1, 1)
-        eoy = datetime(year + 1, 1, 1)
+        boy = datetime.datetime(year, 1, 1)
+        eoy = datetime.datetime(year + 1, 1, 1)
         seconds = remainder * (eoy - boy).total_seconds()
 
-        return forceutc(boy + timedelta(seconds=seconds))
+        return forceutc(boy + datetime.timedelta(seconds=seconds))
     elif isinstance(atime[0],float):
         T = []
         for t in atime:
@@ -171,11 +174,11 @@ def datetime2yeardec(t):
 
     t = forceutc(t)
 
-    assert isinstance(t,datetime)
+    assert isinstance(t, datetime.datetime)
 
     year = t.year
-    boy = datetime(year, 1, 1,tzinfo=UTC)
-    eoy = datetime(year + 1, 1, 1, tzinfo=UTC)
+    boy = datetime.datetime(year, 1, 1,tzinfo=UTC)
+    eoy = datetime.datetime(year + 1, 1, 1, tzinfo=UTC)
     return year + ((t - boy).total_seconds() / ((eoy - boy).total_seconds()))
 
 
@@ -211,7 +214,7 @@ def find_nearest(x,x0):
 
     # NOTE: not trapping IndexError (all-nan) becaues returning None can surprise with slice indexing
     for i,xi in enumerate(x0):
-        if xi is not None and (isinstance(xi,datetime) or np.isfinite(xi)):
+        if xi is not None and (isinstance(xi, datetime.datetime) or np.isfinite(xi)):
             ind[i] = np.nanargmin(abs(x-xi))
         else:
             raise ValueError('x0 must NOT be None or NaN to avoid surprising None return value')
@@ -242,4 +245,4 @@ def randomdate(year):
     else:
         doy = random.randrange(365)
 
-    return date(year, 1, 1) + timedelta(days=doy)
+    return datetime.date(year, 1, 1) + datetime.timedelta(days=doy)

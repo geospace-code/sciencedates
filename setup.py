@@ -6,8 +6,9 @@ from setuptools import setup,find_packages
 
 setup(name='sciencedates',
       packages=find_packages(),
-      version = '1.3.0',
+      version = '1.3.1',
       description='Date conversions used in the sciences.',
+      long_description=open('README.rst').read(),
       author = 'Michael Hirsch, Ph.D.',
       url = 'https://github.com/scivision/sciencedates',
       classifiers=[
