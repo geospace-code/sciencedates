@@ -6,6 +6,9 @@
 
 .. image:: https://coveralls.io/repos/github/scivision/sciencedates/badge.svg?branch=master
     :target: https://coveralls.io/github/scivision/sciencedates?branch=master
+    
+.. image:: https://ci.appveyor.com/api/projects/status/r6adn3fdvk1qcx4r?svg=true
+    :target: https://ci.appveyor.com/project/scivision/sciencedates
 
 .. image:: https://api.codeclimate.com/v1/badges/47852e6e896d404d20a5/maintainability
    :target: https://codeclimate.com/github/scivision/sciencedates/maintainability
@@ -25,14 +28,17 @@ Install
     python -m pip install -e .
     
 
-Examples
+Usage
 ========
 
 .. code:: python
 
-    from pytz import UTC
-    from datetime import datetime
     import sciencedates as sd
 
-    T = datetime(2013,7,2,12,0,0,tzinfo=UTC)
-    yd,utsec=sd.datetime2yd(T)
+    T = '2013-07-02T12'
+    yeardoy, utsec = sd.datetime2yd(T)
+    
+Results in year,DayOfYear; UTC fraction of day [seconds]
+
+    (2013102, 72000.0)
+
