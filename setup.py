@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 install_requires = ['numpy','pytz','python-dateutil']
-tests_require=['nose','coveralls']
+tests_require=['pytest','nose','coveralls']
 # %%
 from setuptools import setup,find_packages
 
