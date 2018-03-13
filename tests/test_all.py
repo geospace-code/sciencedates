@@ -4,10 +4,11 @@ from pytz import timezone, UTC
 from numpy.testing import assert_allclose,assert_equal,run_module_suite
 #
 import sciencedates as sd
-
+#
+t0 = datetime.datetime(2013,7,2,12,0,0,tzinfo=UTC)
 
 def test_yearint():
-    t0 = datetime.datetime(2013,7,2,12,0,0,tzinfo=UTC)
+
     yd,utsec = sd.datetime2yd(t0)
 
     utsec2 = sd.dt2utsec(t0)
@@ -15,8 +16,13 @@ def test_yearint():
     assert sd.yd2datetime(yd,utsec) == t0
     assert utsec==utsec2
 
+def test_date2doy():
+    doy,year = sd.date2doy(t0)
+
+    assert year == t0.year
+    assert doy == 183
+
 def test_yeardec():
-    t0 = datetime.datetime(2013,7,2,12,0,0,tzinfo=UTC)
     yeardec = sd.datetime2yeardec(t0)
 
     assert_allclose(yeardec, 2013.5)

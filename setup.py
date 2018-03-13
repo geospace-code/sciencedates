@@ -6,7 +6,7 @@ from setuptools import setup,find_packages
 
 setup(name='sciencedates',
       packages=find_packages(),
-      version = '1.3.2',
+      version = '1.3.3',
       description='Date conversions used in the sciences.',
       long_description=open('README.rst').read(),
       author = 'Michael Hirsch, Ph.D.',

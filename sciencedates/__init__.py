@@ -17,6 +17,9 @@ def datetime2yd(T):
     utsec: seconds from midnight utc
     """
     T = forceutc(T)
+    if T is None:
+        return None,None
+
     T = np.atleast_1d(T)
 
     utsec= np.empty_like(T, float)
@@ -38,6 +41,9 @@ def yd2datetime(yd,utsec=None):
 
     http://stackoverflow.com/questions/2427555/python-question-year-and-day-of-year-to-date
     """
+    if yd is None:
+        return
+# %%
     yd = str(yd)
     if len(yd) != 7:
         raise ValueError('yyyyddd expected')
@@ -53,12 +59,15 @@ def yd2datetime(yd,utsec=None):
 
 
 def date2doy(t):
-    yd = str(datetime2yd(t)[0][0])
+    if t is None:
+        return None, None
+# %%
+    yd = str(datetime2yd(t)[0])
 
     year = int(yd[:4])
     doy  = int(yd[4:])
 
-    assert 0 < doy < 366   # yes, < 366 for leap year too. normal year 0..364.  Leap 0..365.
+    assert 0 < doy < 366,'day of year must be 0 < doy < 366'   # yes, < 366 for leap year too. normal year 0..364.  Leap 0..365.
 
     return doy, year
 
@@ -74,6 +83,9 @@ def datetime2gtd(T, glon=np.nan):
     utsec: seconds from midnight utc
     stl: local solar time
     """
+    if T is None:
+        return (None,)*3
+# %%
     T =   np.atleast_1d(T)
     glon= np.atleast_2d(glon)
     iyd=  np.empty_like(T, int)
@@ -97,6 +109,9 @@ def dt2utsec(t):
     input: datetime
     output: float utc seconds since THIS DAY'S MIDNIGHT
     """
+    if t is None:
+        return None
+
     t = forceutc(t)
 
     return datetime.timedelta.total_seconds(t-datetime.datetime.combine(t.date(), datetime.time(0,tzinfo=UTC)))
@@ -109,6 +124,9 @@ def forceutc(t):
     input: python datetime (naive, utc, non-utc) or Numpy datetime64  #FIXME add Pandas and AstroPy time classes
     output: utc datetime
     """
+    # need to passthrough None for simpler external logic.
+    if t is None:
+        return
 #%% polymorph to datetime
     if isinstance(t,str):
         t = parse(t)
@@ -144,6 +162,9 @@ def yeardec2datetime(atime):
     This is the inverse of datetime2yeardec.
     assert dt2t(t2dt(atime)) == atime
     """
+    if atime is None:
+        return None
+# %%
     if isinstance(atime,(float,int)): #typically a float
 
         year = int(atime)
@@ -169,7 +190,9 @@ def datetime2yeardec(t):
     time distances should be preserved: If bdate-adate=ddate-cdate then
     dt2t(bdate)-dt2t(adate) = dt2t(ddate)-dt2t(cdate)
     """
-
+    if t is None:
+        return None
+# %%
     if isinstance(t,str):
         t = parse(t)
     elif isinstance(t, datetime.datetime):
@@ -247,6 +270,7 @@ if __name__ == '__main__':
 
 #def randomdate(year:int) -> datetime:
 def randomdate(year):
+    """ gives random date in year"""
     if calendar.isleap(year):
         doy = random.randrange(366)
     else:
