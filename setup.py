@@ -26,5 +26,6 @@ setup(name='sciencedates',
       tests_require=tests_require,
       extras_require={'tests':tests_require,
                       'plot':['xarray','matplotlib']},
+      scripts=['date2doy.py','randomdate.py'],
 	  )
 
