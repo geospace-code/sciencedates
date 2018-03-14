@@ -134,7 +134,7 @@ def forceutc(t):
     if isinstance(t,str):
         t = parse(t)
     elif isinstance(t, np.datetime64):
-        t=t.astype('M8[ms]').astype('O') #for Numpy 1.10 at least...
+        t = t.astype(datetime.datetime)
     elif isinstance(t, datetime.datetime):
         pass
     elif isinstance(t, datetime.date):

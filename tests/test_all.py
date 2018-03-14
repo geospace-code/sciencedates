@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import datetime
+import numpy as np
 from pytz import timezone, UTC
 from numpy.testing import assert_allclose,assert_equal,run_module_suite
 #
@@ -7,6 +8,7 @@ import sciencedates as sd
 #
 T = [datetime.datetime(2013,7,2,12,0,0,tzinfo=UTC)]
 T.append(T[0].date())
+T.append(np.datetime64(T[0]))
 
 def test_yearint():
 
@@ -17,6 +19,8 @@ def test_yearint():
 
         if isinstance(t,datetime.datetime):
             assert sd.yd2datetime(yd,utsec) == t
+        elif isinstance(t,np.datetime64):
+            assert sd.yd2datetime(yd,utsec) == sd.forceutc(t.astype(datetime.datetime))
         else:
             assert sd.yd2datetime(yd,utsec).date() == t
 
@@ -26,6 +30,8 @@ def test_date2doy():
     for t in T:
         doy,year = sd.date2doy(t)
 
+        if isinstance(t,np.datetime64):
+            t = t.astype(datetime.date)
         assert year == t.year
         assert doy == 183
 
@@ -55,8 +61,8 @@ def test_gtd():
     iyd,utsec,stl = sd.datetime2gtd(T, glon=42)
 
     assert_allclose(iyd,183)
-    assert_allclose(utsec,(43200,0))
-    assert_allclose(stl, (14.8, 2.8))
+    assert_allclose(utsec,(43200,0,43200))
+    assert_allclose(stl, (14.8, 2.8, 14.8))
 
 
 def test_findnearest():
