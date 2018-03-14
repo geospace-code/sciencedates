@@ -247,7 +247,7 @@ def find_nearest(x,x0):
 
     # NOTE: not trapping IndexError (all-nan) becaues returning None can surprise with slice indexing
     for i,xi in enumerate(x0):
-        if xi is not None and (isinstance(xi, datetime.datetime) or np.isfinite(xi)):
+        if xi is not None and (isinstance(xi, (datetime.datetime,datetime.date,np.datetime64)) or np.isfinite(xi)):
             ind[i] = np.nanargmin(abs(x-xi))
         else:
             raise ValueError('x0 must NOT be None or NaN to avoid surprising None return value')
