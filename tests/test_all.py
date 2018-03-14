@@ -5,51 +5,62 @@ from numpy.testing import assert_allclose,assert_equal,run_module_suite
 #
 import sciencedates as sd
 #
-t0 = datetime.datetime(2013,7,2,12,0,0,tzinfo=UTC)
+T = [datetime.datetime(2013,7,2,12,0,0,tzinfo=UTC)]
+T.append(T[0].date())
 
 def test_yearint():
 
-    yd,utsec = sd.datetime2yd(t0)
+    for t in T:
+        yd,utsec = sd.datetime2yd(t)
 
-    utsec2 = sd.dt2utsec(t0)
+        utsec2 = sd.dt2utsec(t)
 
-    assert sd.yd2datetime(yd,utsec) == t0
-    assert utsec==utsec2
+        if isinstance(t,datetime.datetime):
+            assert sd.yd2datetime(yd,utsec) == t
+        else:
+            assert sd.yd2datetime(yd,utsec).date() == t
+
+        assert utsec==utsec2
 
 def test_date2doy():
-    doy,year = sd.date2doy(t0)
+    for t in T:
+        doy,year = sd.date2doy(t)
 
-    assert year == t0.year
-    assert doy == 183
+        assert year == t.year
+        assert doy == 183
 
 def test_yeardec():
-    yeardec = sd.datetime2yeardec(t0)
+    for t,r in zip(T,(2013.5,2013.4986301369863)):
+        yeardec = sd.datetime2yeardec(t)
 
-    assert_allclose(yeardec, 2013.5)
-    assert sd.yeardec2datetime(yeardec) == t0
+        assert_allclose(yeardec, r)
+        if isinstance(t,datetime.datetime):
+            assert sd.yeardec2datetime(yeardec) == t
+        else:
+            assert sd.yeardec2datetime(yeardec).date() == t
 
 def test_utc():
-    t0 = datetime.datetime(2013,7,2,12,0,0)
-    estdt = timezone('EST').localize(t0)
+
+    estdt = T[0].astimezone(timezone('EST'))
     utcdt = sd.forceutc(estdt)
 
     assert utcdt==estdt
     assert utcdt.tzname()=='UTC'
 
-
-    d0 = datetime.date(2013,7,2)
-    assert sd.forceutc(d0) == d0
+    d = T[0].date()
+    assert sd.forceutc(d) == d
 
 def test_gtd():
-    t0 = datetime.datetime(2013,7,2,12,0,0)
-    iyd,utsec,stl= sd.datetime2gtd(t0,glon=42)
 
-    assert iyd[0]==183
-    assert_allclose(utsec[0],43200)
-    assert_allclose(stl[0],14.8)
+    iyd,utsec,stl = sd.datetime2gtd(T, glon=42)
+
+    assert_allclose(iyd,183)
+    assert_allclose(utsec,(43200,0))
+    assert_allclose(stl, (14.8, 2.8))
 
 
 def test_findnearest():
+
     indf,xf = sd.find_nearest([10,15,12,20,14,33],[32,12.01])
     assert_allclose(indf,[5,2])
     assert_allclose(xf,[33.,12.])

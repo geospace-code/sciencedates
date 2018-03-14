@@ -31,6 +31,10 @@ Install
 Usage
 ========
 
+
+Datetime => Year,DayOfYear
+--------------------------
+
 .. code:: python
 
     import sciencedates as sd

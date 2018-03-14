@@ -28,7 +28,7 @@ def datetime2yd(T):
         utsec[i] = dt2utsec(t)
         yd[i] = t.year*1000 + int(t.strftime('%j'))
 
-    return yd.squeeze()[()] , utsec.squeeze()[()]
+    return yd.squeeze()[()], utsec.squeeze()[()]
 
 
 def yd2datetime(yd,utsec=None):
@@ -100,7 +100,7 @@ def datetime2gtd(T, glon=np.nan):
 
         stl[i,...] = utsec[i]/3600 + glon/15 #FIXME let's be sure this is appropriate
 
-    return iyd,utsec,stl
+    return iyd, utsec, stl.squeeze()
 
 
 #def dt2utsec(t: datetime) -> float:
@@ -111,6 +111,9 @@ def dt2utsec(t):
     """
     if t is None:
         return None
+
+    if isinstance(t,datetime.date) and not isinstance(t,datetime.datetime):
+        return 0
 
     t = forceutc(t)
 
@@ -173,14 +176,16 @@ def yeardec2datetime(atime):
         eoy = datetime.datetime(year + 1, 1, 1)
         seconds = remainder * (eoy - boy).total_seconds()
 
-        return forceutc(boy + datetime.timedelta(seconds=seconds))
+        T = forceutc(boy + datetime.timedelta(seconds=seconds))
     elif isinstance(atime[0],float):
         T = []
         for t in atime:
             T.append(yeardec2datetime(t))
-        return T
     else:
         raise TypeError('expecting float, not {}'.format(type(atime)))
+
+    return T
+
 
 def datetime2yeardec(t):
     """
@@ -195,22 +200,20 @@ def datetime2yeardec(t):
 # %%
     if isinstance(t,str):
         t = parse(t)
-    elif isinstance(t, datetime.datetime):
-        pass
-    elif isinstance(t, datetime.date):
-        t = datetime.datetime.combine(t, datetime.time.min)
-
 
     t = forceutc(t)
-
-    assert isinstance(t, datetime.datetime)
-
     year = t.year
-    boy = datetime.datetime(year, 1, 1,tzinfo=UTC)
-    eoy = datetime.datetime(year + 1, 1, 1, tzinfo=UTC)
+
+    if isinstance(t,datetime.datetime):
+        boy = datetime.datetime(year, 1, 1,tzinfo=UTC)
+        eoy = datetime.datetime(year + 1, 1, 1, tzinfo=UTC)
+    elif isinstance(t,datetime.date):
+        boy = datetime.date(year, 1, 1)
+        eoy = datetime.date(year + 1, 1, 1)
+    else:
+        raise TypeError('datetime input only')
 
     return year + ((t - boy).total_seconds() / ((eoy - boy).total_seconds()))
-
 
 #%%
 def find_nearest(x,x0):
