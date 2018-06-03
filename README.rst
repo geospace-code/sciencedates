@@ -34,7 +34,7 @@ Usage
 
 
 Datetime => Year, DayOfYear
---------------------------
+---------------------------
 
 .. code:: python
 
