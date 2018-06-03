@@ -5,6 +5,7 @@ import numpy as np
 from dateutil.parser import parse
 import calendar
 import random
+from typing import Union
 
 
 def datetime2yd(T):
@@ -18,20 +19,20 @@ def datetime2yd(T):
     """
     T = forceutc(T)
     if T is None:
-        return None,None
+        return None, None
 
     T = np.atleast_1d(T)
 
-    utsec= np.empty_like(T, float)
-    yd =   np.empty_like(T, int)
-    for i,t in enumerate(T):
+    utsec = np.empty_like(T, float)
+    yd = np.empty_like(T, int)
+    for i, t in enumerate(T):
         utsec[i] = dt2utsec(t)
         yd[i] = t.year*1000 + int(t.strftime('%j'))
 
     return yd.squeeze()[()], utsec.squeeze()[()]
 
 
-def yd2datetime(yd,utsec=None):
+def yd2datetime(yd, utsec=None):
     """
     Inputs:
     yd: yyyyddd four digit year, 3 digit day of year (INTEGER 7 digits)
@@ -49,7 +50,7 @@ def yd2datetime(yd,utsec=None):
         raise ValueError('yyyyddd expected')
 
     year = int(yd[:4])
-    assert 0 < year < 3000,'year not in expected format'
+    assert 0 < year < 3000, 'year not in expected format'
 
     dt = forceutc(datetime.datetime(year, 1, 1) + datetime.timedelta(days=int(yd[4:]) - 1))
     if utsec is not None:
@@ -65,9 +66,9 @@ def date2doy(t):
     yd = str(datetime2yd(t)[0])
 
     year = int(yd[:4])
-    doy  = int(yd[4:])
+    doy = int(yd[4:])
 
-    assert 0 < doy < 366,'day of year must be 0 < doy < 366'   # yes, < 366 for leap year too. normal year 0..364.  Leap 0..365.
+    assert 0 < doy < 366, 'day of year must be 0 < doy < 366'   # yes, < 366 for leap year too. normal year 0..364.  Leap 0..365.
 
     return doy, year
 
@@ -86,25 +87,25 @@ def datetime2gtd(T, glon=np.nan):
     if T is None:
         return (None,)*3
 # %%
-    T =   np.atleast_1d(T)
-    glon= np.atleast_2d(glon)
-    iyd=  np.empty_like(T, int)
-    utsec=np.empty_like(T, float)
+    T = np.atleast_1d(T)
+    glon = np.atleast_2d(glon)
+    iyd = np.empty_like(T, int)
+    utsec = np.empty_like(T, float)
     stl = np.empty((T.size, glon.shape[0], glon.shape[1]))
 
-    for i,t in enumerate(T):
+    for i, t in enumerate(T):
         t = forceutc(t)
         iyd[i] = int(t.strftime('%j'))
-        #seconds since utc midnight
+        # seconds since utc midnight
         utsec[i] = dt2utsec(t)
 
-        stl[i,...] = utsec[i]/3600 + glon/15 #FIXME let's be sure this is appropriate
+        # FIXME let's be sure this is appropriate
+        stl[i, ...] = utsec[i] / 3600 + glon / 15
 
     return iyd, utsec, stl.squeeze()
 
 
-#def dt2utsec(t: datetime) -> float:
-def dt2utsec(t):
+def dt2utsec(t: Union[datetime.date, datetime.datetime]) -> float:
     """
     input: datetime
     output: float utc seconds since THIS DAY'S MIDNIGHT
@@ -112,12 +113,17 @@ def dt2utsec(t):
     if t is None:
         return None
 
-    if isinstance(t,datetime.date) and not isinstance(t,datetime.datetime):
+    if isinstance(t, datetime.date) and not isinstance(t, datetime.datetime):
         return 0
 
     t = forceutc(t)
 
-    return datetime.timedelta.total_seconds(t-datetime.datetime.combine(t.date(), datetime.time(0,tzinfo=UTC)))
+    if isinstance(t, (tuple, list, np.ndarray)):
+        t = np.asarray([dt2utsec(T) for T in t])
+
+    assert isinstance(t, datetime.datetime)
+
+    return datetime.timedelta.total_seconds(t - datetime.datetime.combine(t.date(), datetime.time(0, tzinfo=UTC)))
 
 
 def forceutc(t):
@@ -130,8 +136,8 @@ def forceutc(t):
     # need to passthrough None for simpler external logic.
     if t is None:
         return
-#%% polymorph to datetime
-    if isinstance(t,str):
+# %% polymorph to datetime
+    if isinstance(t, str):
         t = parse(t)
     elif isinstance(t, np.datetime64):
         t = t.astype(datetime.datetime)
@@ -139,36 +145,35 @@ def forceutc(t):
         pass
     elif isinstance(t, datetime.date):
         return t
-    elif isinstance(t,(np.ndarray,list,tuple)):
+    elif isinstance(t, (np.ndarray, list, tuple)):
         return np.asarray([forceutc(T) for T in t])
     else:
         raise TypeError('datetime only input')
-#%% enforce UTC on datetime
-    if t.tzinfo is None: #datetime-naive
-        t = t.replace(tzinfo = UTC)
-    else: #datetime-aware
-        t = t.astimezone(UTC) #changes timezone, preserving absolute time. E.g. noon EST = 5PM UTC
+# %% enforce UTC on datetime
+    if t.tzinfo is None:  # datetime-naive
+        t = t.replace(tzinfo=UTC)
+    else:  # datetime-aware
+        t = t.astimezone(UTC)  # changes timezone, preserving absolute time. E.g. noon EST = 5PM UTC
 
     return t
 
 
-"""
-http://stackoverflow.com/questions/19305991/convert-fractional-years-to-a-real-date-in-python
-Authored by "unutbu" http://stackoverflow.com/users/190597/unutbu
-
-In Python, go from decimal year (YYYY.YYY) to datetime,
-and from datetime to decimal year.
-"""
 def yeardec2datetime(atime):
     """
     Convert atime (a float) to DT.datetime
     This is the inverse of datetime2yeardec.
     assert dt2t(t2dt(atime)) == atime
+
+    http://stackoverflow.com/questions/19305991/convert-fractional-years-to-a-real-date-in-python
+    Authored by "unutbu" http://stackoverflow.com/users/190597/unutbu
+
+    In Python, go from decimal year (YYYY.YYY) to datetime,
+    and from datetime to decimal year.
     """
     if atime is None:
         return None
 # %%
-    if isinstance(atime,(float,int)): #typically a float
+    if isinstance(atime, (float, int)):  # typically a float
 
         year = int(atime)
         remainder = atime - year
@@ -177,7 +182,7 @@ def yeardec2datetime(atime):
         seconds = remainder * (eoy - boy).total_seconds()
 
         T = forceutc(boy + datetime.timedelta(seconds=seconds))
-    elif isinstance(atime[0],float):
+    elif isinstance(atime[0], float):
         T = []
         for t in atime:
             T.append(yeardec2datetime(t))
@@ -198,16 +203,16 @@ def datetime2yeardec(t):
     if t is None:
         return None
 # %%
-    if isinstance(t,str):
+    if isinstance(t, str):
         t = parse(t)
 
     t = forceutc(t)
     year = t.year
 
-    if isinstance(t,datetime.datetime):
-        boy = datetime.datetime(year, 1, 1,tzinfo=UTC)
+    if isinstance(t, datetime.datetime):
+        boy = datetime.datetime(year, 1, 1, tzinfo=UTC)
         eoy = datetime.datetime(year + 1, 1, 1, tzinfo=UTC)
-    elif isinstance(t,datetime.date):
+    elif isinstance(t, datetime.date):
         boy = datetime.date(year, 1, 1)
         eoy = datetime.date(year + 1, 1, 1)
     else:
@@ -215,8 +220,9 @@ def datetime2yeardec(t):
 
     return year + ((t - boy).total_seconds() / ((eoy - boy).total_seconds()))
 
-#%%
-def find_nearest(x,x0):
+
+# %%
+def find_nearest(x, x0):
     """
     This find_nearest function does NOT assume sorted input
 
@@ -234,20 +240,20 @@ def find_nearest(x,x0):
     http://stackoverflow.com/questions/2566412/find-nearest-value-in-numpy-array
 
     """
-    x =  np.asanyarray(x) #for indexing upon return
+    x = np.asanyarray(x)  # for indexing upon return
     x0 = np.atleast_1d(x0)
-#%%
-    if x.size==0 or x0.size==0:
+# %%
+    if x.size == 0 or x0.size == 0:
         raise ValueError('empty input(s)')
 
-    if not x0.ndim in (0,1):
+    if x0.ndim not in (0, 1):
         raise ValueError('2-D x0 not handled yet')
-#%%
-    ind = np.empty_like(x0,dtype=int)
+# %%
+    ind = np.empty_like(x0, dtype=int)
 
     # NOTE: not trapping IndexError (all-nan) becaues returning None can surprise with slice indexing
-    for i,xi in enumerate(x0):
-        if xi is not None and (isinstance(xi, (datetime.datetime,datetime.date,np.datetime64)) or np.isfinite(xi)):
+    for i, xi in enumerate(x0):
+        if xi is not None and (isinstance(xi, (datetime.datetime, datetime.date, np.datetime64)) or np.isfinite(xi)):
             ind[i] = np.nanargmin(abs(x-xi))
         else:
             raise ValueError('x0 must NOT be None or NaN to avoid surprising None return value')
@@ -255,24 +261,24 @@ def find_nearest(x,x0):
     return ind.squeeze()[()], x[ind].squeeze()[()]   # [()] to pop scalar from 0d array while being OK with ndim>0
 
 
-def INCORRECTRESULT_using_bisect(x,X0): #pragma: no cover
+def INCORRECTRESULT_using_bisect(x, X0):  # pragma: no cover
     X0 = np.atleast_1d(X0)
     x.sort()
-    ind = [bisect(x,x0) for x0 in X0]
+    ind = [bisect(x, x0) for x0 in X0]
 
     x = np.asanyarray(x)
-    return np.asanyarray(ind),x[ind]
+    return np.asanyarray(ind), x[ind]
+
 
 if __name__ == '__main__':
     from bisect import bisect
 
-    print(find_nearest([10,15,12,20,14,33],[32,12.01]))
+    print(find_nearest([10, 15, 12, 20, 14, 33], [32, 12.01]))
 
-    print(INCORRECTRESULT_using_bisect([10,15,12,20,14,33],[32,12.01]))
+    print(INCORRECTRESULT_using_bisect([10, 15, 12, 20, 14, 33], [32, 12.01]))
 
 
-#def randomdate(year:int) -> datetime:
-def randomdate(year):
+def randomdate(year: int) -> datetime.date:
     """ gives random date in year"""
     if calendar.isleap(year):
         doy = random.randrange(366)
