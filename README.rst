@@ -18,6 +18,7 @@
 sciencedates
 ============
 Date conversions used in the sciences.
+The assumption is that datetimes are timezone-naive, as this will be required soon in Numpy *et al* for ``numpy.datetime64``.
 
 .. contents::
 
@@ -32,7 +33,7 @@ Usage
 ========
 
 
-Datetime => Year,DayOfYear
+Datetime => Year, DayOfYear
 --------------------------
 
 .. code:: python
