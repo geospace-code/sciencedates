@@ -2,7 +2,7 @@
 from setuptools import setup, find_packages
 
 install_requires = ['numpy', 'pytz', 'python-dateutil']
-tests_require = ['pytest', 'nose', 'coveralls']
+tests_require = ['pytest', 'nose', 'coveralls', 'flake8', 'mypy']
 # %%
 
 setup(name='sciencedates',
