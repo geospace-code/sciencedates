@@ -5,34 +5,36 @@ import numpy as np
 from dateutil.parser import parse
 import calendar
 import random
-from typing import Union
+from typing import Union, Tuple, Any
 
 
-def datetime2yd(T):
+def datetime2yeardoy(time: Union[str, datetime.datetime]) -> Tuple[int, float]:
     """
     Inputs:
-    T: Numpy 1-D array of datetime.datetime OR string suitable for dateutil.parser.parse
+    T: Numpy 1-D array of datetime.datetime OR string for dateutil.parser.parse
 
     Outputs:
     yd: yyyyddd four digit year, 3 digit day of year (INTEGER)
     utsec: seconds from midnight utc
     """
-    T = forceutc(T)
-    if T is None:
-        return None, None
-
-    T = np.atleast_1d(T)
+    T: np.ndarray = np.atleast_1d(time)
 
     utsec = np.empty_like(T, float)
     yd = np.empty_like(T, int)
     for i, t in enumerate(T):
-        utsec[i] = dt2utsec(t)
+        if isinstance(t, np.datetime64):
+            t = t.astype(datetime.datetime)
+        elif isinstance(t, str):
+            t = parse(t)
+
+        utsec[i] = datetime2utsec(t)
         yd[i] = t.year*1000 + int(t.strftime('%j'))
 
     return yd.squeeze()[()], utsec.squeeze()[()]
 
 
-def yd2datetime(yd, utsec=None):
+def yd2datetime(yeardate: int,
+                utsec: Union[float, int]=None) -> datetime.datetime:
     """
     Inputs:
     yd: yyyyddd four digit year, 3 digit day of year (INTEGER 7 digits)
@@ -42,28 +44,25 @@ def yd2datetime(yd, utsec=None):
 
     http://stackoverflow.com/questions/2427555/python-question-year-and-day-of-year-to-date
     """
-    if yd is None:
-        return
 # %%
-    yd = str(yd)
+    yd = str(yeardate)
     if len(yd) != 7:
         raise ValueError('yyyyddd expected')
 
     year = int(yd[:4])
     assert 0 < year < 3000, 'year not in expected format'
 
-    dt = forceutc(datetime.datetime(year, 1, 1) + datetime.timedelta(days=int(yd[4:]) - 1))
+    dt = datetime.datetime(year, 1, 1) + datetime.timedelta(days=int(yd[4:]) - 1)
+    assert isinstance(dt, datetime.datetime)
+
     if utsec is not None:
         dt += datetime.timedelta(seconds=utsec)
 
     return dt
 
 
-def date2doy(t):
-    if t is None:
-        return None, None
-# %%
-    yd = str(datetime2yd(t)[0])
+def date2doy(t: Union[str, datetime.datetime]) -> Tuple[int, int]:
+    yd = str(datetime2yeardoy(t)[0])
 
     year = int(yd[:4])
     doy = int(yd[4:])
@@ -73,10 +72,11 @@ def date2doy(t):
     return doy, year
 
 
-def datetime2gtd(T, glon=np.nan):
+def datetime2gtd(time: Union[str, datetime.datetime],
+                 glon: float=np.nan) -> Tuple[int, float, float]:
     """
     Inputs:
-    T: Numpy 1-D array of datetime.datetime OR string suitable for dateutil.parser.parse
+    time: Numpy 1-D array of datetime.datetime OR string for dateutil.parser.parse
     glon: Numpy 2-D array of geodetic longitudes (degrees)
 
     Outputs:
@@ -84,49 +84,49 @@ def datetime2gtd(T, glon=np.nan):
     utsec: seconds from midnight utc
     stl: local solar time
     """
-    if T is None:
-        return (None,)*3
 # %%
-    T = np.atleast_1d(T)
-    glon = np.atleast_2d(glon)
+    T = np.atleast_1d(time)
+    lon = np.atleast_2d(glon)
     iyd = np.empty_like(T, int)
     utsec = np.empty_like(T, float)
-    stl = np.empty((T.size, glon.shape[0], glon.shape[1]))
+    stl = np.empty((T.size, lon.shape[0], lon.shape[1]))
 
     for i, t in enumerate(T):
-        t = forceutc(t)
+        if isinstance(t, str):
+            t = parse(t)
+        elif isinstance(t, np.datetime64):
+            t = t.astype(datetime.datetime)
+
         iyd[i] = int(t.strftime('%j'))
         # seconds since utc midnight
-        utsec[i] = dt2utsec(t)
+        utsec[i] = datetime2utsec(t)
 
         # FIXME let's be sure this is appropriate
-        stl[i, ...] = utsec[i] / 3600 + glon / 15
+        stl[i, ...] = utsec[i] / 3600 + lon / 15
 
     return iyd, utsec, stl.squeeze()
 
 
-def dt2utsec(t: Union[datetime.date, datetime.datetime]) -> float:
+def datetime2utsec(t: Union[str, datetime.date, datetime.datetime, np.datetime64]) -> float:
     """
     input: datetime
     output: float utc seconds since THIS DAY'S MIDNIGHT
     """
-    if t is None:
-        return None
-
     if isinstance(t, datetime.date) and not isinstance(t, datetime.datetime):
-        return 0
-
-    t = forceutc(t)
+        return 0.
+    elif isinstance(t, np.datetime64):
+        t = t.astype(datetime.datetime)
+    elif isinstance(t, str):
+        t = parse(t)
 
     if isinstance(t, (tuple, list, np.ndarray)):
-        t = np.asarray([dt2utsec(T) for T in t])
+        t = np.asarray([datetime2utsec(T) for T in t])
 
-    assert isinstance(t, datetime.datetime)
+    return datetime.timedelta.total_seconds(t - datetime.datetime.combine(t.date(),
+                                                                          datetime.datetime.min.time()))
 
-    return datetime.timedelta.total_seconds(t - datetime.datetime.combine(t.date(), datetime.time(0, tzinfo=UTC)))
 
-
-def forceutc(t):
+def forceutc(t: Union[str, datetime.datetime, datetime.date, np.datetime64]) -> Union[datetime.datetime, datetime.date]:
     """
     Add UTC to datetime-naive and convert to UTC for datetime aware
 
@@ -134,8 +134,6 @@ def forceutc(t):
     output: utc datetime
     """
     # need to passthrough None for simpler external logic.
-    if t is None:
-        return
 # %% polymorph to datetime
     if isinstance(t, str):
         t = parse(t)
@@ -158,7 +156,7 @@ def forceutc(t):
     return t
 
 
-def yeardec2datetime(atime):
+def yeardec2datetime(atime: float) -> datetime.datetime:
     """
     Convert atime (a float) to DT.datetime
     This is the inverse of datetime2yeardec.
@@ -170,8 +168,6 @@ def yeardec2datetime(atime):
     In Python, go from decimal year (YYYY.YYY) to datetime,
     and from datetime to decimal year.
     """
-    if atime is None:
-        return None
 # %%
     if isinstance(atime, (float, int)):  # typically a float
 
@@ -181,18 +177,17 @@ def yeardec2datetime(atime):
         eoy = datetime.datetime(year + 1, 1, 1)
         seconds = remainder * (eoy - boy).total_seconds()
 
-        T = forceutc(boy + datetime.timedelta(seconds=seconds))
+        T = boy + datetime.timedelta(seconds=seconds)
+        assert isinstance(T, datetime.datetime)
     elif isinstance(atime[0], float):
-        T = []
-        for t in atime:
-            T.append(yeardec2datetime(t))
+        T = [yeardec2datetime(t) for t in atime]
     else:
         raise TypeError('expecting float, not {}'.format(type(atime)))
 
     return T
 
 
-def datetime2yeardec(t):
+def datetime2yeardec(time: Union[str, datetime.datetime, datetime.date]) -> float:
     """
     Convert a datetime into a float. The integer part of the float should
     represent the year.
@@ -200,29 +195,25 @@ def datetime2yeardec(t):
     time distances should be preserved: If bdate-adate=ddate-cdate then
     dt2t(bdate)-dt2t(adate) = dt2t(ddate)-dt2t(cdate)
     """
-    if t is None:
-        return None
-# %%
-    if isinstance(t, str):
-        t = parse(t)
+    if isinstance(time, str):
+        t = parse(time)
+    elif isinstance(time, datetime.datetime):
+        t = time
+    elif isinstance(time, datetime.date):
+        t = datetime.datetime.combine(time, datetime.datetime.min.time())
+    else:
+        raise TypeError(f'unknown input type {type(time)}')
 
-    t = forceutc(t)
     year = t.year
 
-    if isinstance(t, datetime.datetime):
-        boy = datetime.datetime(year, 1, 1, tzinfo=UTC)
-        eoy = datetime.datetime(year + 1, 1, 1, tzinfo=UTC)
-    elif isinstance(t, datetime.date):
-        boy = datetime.date(year, 1, 1)
-        eoy = datetime.date(year + 1, 1, 1)
-    else:
-        raise TypeError('datetime input only')
+    boy = datetime.datetime(year, 1, 1)
+    eoy = datetime.datetime(year + 1, 1, 1)
 
     return year + ((t - boy).total_seconds() / ((eoy - boy).total_seconds()))
 
 
 # %%
-def find_nearest(x, x0):
+def find_nearest(x, x0) -> Tuple[int, Any]:
     """
     This find_nearest function does NOT assume sorted input
 

@@ -8,7 +8,7 @@ from sciencedates import randomdate
 
 if __name__ == '__main__':
     from argparse import ArgumentParser
-    p = ArgumentParser()
+    p = ArgumentParser(description='generate random date in year')
     p.add_argument('year', type=int,
                    nargs='?', default=date.today().year)
     P = p.parse_args()

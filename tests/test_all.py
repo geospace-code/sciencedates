@@ -1,27 +1,31 @@
 #!/usr/bin/env python
 import datetime
+from dateutil.parser import parse
 import numpy as np
-from pytz import timezone, UTC
+from pytz import timezone
 from numpy.testing import assert_allclose, assert_equal, run_module_suite
 #
 import sciencedates as sd
 #
-T = [datetime.datetime(2013, 7, 2, 12, 0, 0, tzinfo=UTC)]
+T = [datetime.datetime(2013, 7, 2, 12, 0, 0)]
 T.append(T[0].date())
 T.append(np.datetime64(T[0]))
+T.append(str(T[0]))
 
 
 def test_yearint():
 
     for t in T:
-        yd, utsec = sd.datetime2yd(t)
+        yd, utsec = sd.datetime2yeardoy(t)
 
-        utsec2 = sd.dt2utsec(t)
+        utsec2 = sd.datetime2utsec(t)
 
         if isinstance(t, datetime.datetime):
             assert sd.yd2datetime(yd, utsec) == t
         elif isinstance(t, np.datetime64):
-            assert sd.yd2datetime(yd, utsec) == sd.forceutc(t.astype(datetime.datetime))
+            assert sd.yd2datetime(yd, utsec) == t.astype(datetime.datetime)
+        elif isinstance(t, str):
+            assert sd.yd2datetime(yd, utsec) == parse(t)
         else:
             assert sd.yd2datetime(yd, utsec).date() == t
 
@@ -34,6 +38,9 @@ def test_date2doy():
 
         if isinstance(t, np.datetime64):
             t = t.astype(datetime.date)
+        elif isinstance(t, str):
+            t = parse(t)
+
         assert year == t.year
         assert doy == 183
 
@@ -66,8 +73,8 @@ def test_gtd():
     iyd, utsec, stl = sd.datetime2gtd(T, glon=42)
 
     assert_allclose(iyd, 183)
-    assert_allclose(utsec, (43200, 0, 43200))
-    assert_allclose(stl, (14.8, 2.8, 14.8))
+    assert_allclose(utsec, (43200, 0, 43200, 43200))
+    assert_allclose(stl, (14.8, 2.8, 14.8, 14.8))
 
 
 def test_findnearest():
