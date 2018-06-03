@@ -7,7 +7,7 @@ tests_require = ['pytest', 'nose', 'coveralls', 'flake8', 'mypy']
 
 setup(name='sciencedates',
       packages=find_packages(),
-      version='1.4.0',
+      version='1.4.1',
       description='Date conversions used in the sciences.',
       long_description=open('README.rst').read(),
       author='Michael Hirsch, Ph.D.',
