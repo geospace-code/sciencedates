@@ -33,8 +33,8 @@ def datetime2yeardoy(time: Union[str, datetime.datetime]) -> Tuple[int, float]:
     return yd.squeeze()[()], utsec.squeeze()[()]
 
 
-def yd2datetime(yeardate: int,
-                utsec: Union[float, int]=None) -> datetime.datetime:
+def yeardoy2datetime(yeardate: int,
+                     utsec: Union[float, int]=None) -> datetime.datetime:
     """
     Inputs:
     yd: yyyyddd four digit year, 3 digit day of year (INTEGER 7 digits)
@@ -44,7 +44,14 @@ def yd2datetime(yeardate: int,
 
     http://stackoverflow.com/questions/2427555/python-question-year-and-day-of-year-to-date
     """
-# %%
+    if isinstance(yeardate, (tuple, list, np.ndarray)):
+        if utsec is None:
+            return np.asarray([yeardoy2datetime(y) for y in yeardate])
+        elif isinstance(utsec, (tuple, list, np.ndarray)):
+            return np.asarray([yeardoy2datetime(y, s) for y, s in zip(yeardate, utsec)])
+
+    yeardate = int(yeardate)
+
     yd = str(yeardate)
     if len(yd) != 7:
         raise ValueError('yyyyddd expected')
@@ -61,13 +68,23 @@ def yd2datetime(yeardate: int,
     return dt
 
 
-def date2doy(t: Union[str, datetime.datetime]) -> Tuple[int, int]:
-    yd = str(datetime2yeardoy(t)[0])
+def date2doy(time: Union[str, datetime.datetime]) -> Tuple[int, int]:
+    """
+    < 366 for leap year too. normal year 0..364.  Leap 0..365.
+    """
 
-    year = int(yd[:4])
-    doy = int(yd[4:])
+    T = np.atleast_1d(time)
 
-    assert 0 < doy < 366, 'day of year must be 0 < doy < 366'   # yes, < 366 for leap year too. normal year 0..364.  Leap 0..365.
+    year = np.empty(T.size, dtype=int)
+    doy = np.empty_like(year)
+
+    for i, t in enumerate(T):
+        yd = str(datetime2yeardoy(t)[0])
+
+        year[i] = int(yd[:4])
+        doy[i] = int(yd[4:])
+
+    assert ((0 < doy) & (doy < 366)).all(), 'day of year must be 0 < doy < 366'
 
     return doy, year
 
@@ -112,15 +129,14 @@ def datetime2utsec(t: Union[str, datetime.date, datetime.datetime, np.datetime64
     input: datetime
     output: float utc seconds since THIS DAY'S MIDNIGHT
     """
-    if isinstance(t, datetime.date) and not isinstance(t, datetime.datetime):
+    if isinstance(t, (tuple, list, np.ndarray)):
+        return np.asarray([datetime2utsec(T) for T in t])
+    elif isinstance(t, datetime.date) and not isinstance(t, datetime.datetime):
         return 0.
     elif isinstance(t, np.datetime64):
         t = t.astype(datetime.datetime)
     elif isinstance(t, str):
         t = parse(t)
-
-    if isinstance(t, (tuple, list, np.ndarray)):
-        t = np.asarray([datetime2utsec(T) for T in t])
 
     return datetime.timedelta.total_seconds(t - datetime.datetime.combine(t.date(),
                                                                           datetime.datetime.min.time()))
@@ -180,7 +196,7 @@ def yeardec2datetime(atime: float) -> datetime.datetime:
         T = boy + datetime.timedelta(seconds=seconds)
         assert isinstance(T, datetime.datetime)
     elif isinstance(atime[0], float):
-        T = [yeardec2datetime(t) for t in atime]
+        return np.asarray([yeardec2datetime(t) for t in atime])
     else:
         raise TypeError('expecting float, not {}'.format(type(atime)))
 
@@ -201,6 +217,8 @@ def datetime2yeardec(time: Union[str, datetime.datetime, datetime.date]) -> floa
         t = time
     elif isinstance(time, datetime.date):
         t = datetime.datetime.combine(time, datetime.datetime.min.time())
+    elif isinstance(time, (tuple, list, np.ndarray)):
+        return np.asarray([datetime2yeardec(t) for t in time])
     else:
         raise TypeError(f'unknown input type {type(time)}')
 

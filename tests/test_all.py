@@ -12,6 +12,8 @@ T.append(T[0].date())
 T.append(np.datetime64(T[0]))
 T.append(str(T[0]))
 
+Tdt = (T[0],)*3
+
 
 def test_yearint():
 
@@ -21,28 +23,30 @@ def test_yearint():
         utsec2 = sd.datetime2utsec(t)
 
         if isinstance(t, datetime.datetime):
-            assert sd.yd2datetime(yd, utsec) == t
+            assert sd.yeardoy2datetime(yd, utsec) == t
         elif isinstance(t, np.datetime64):
-            assert sd.yd2datetime(yd, utsec) == t.astype(datetime.datetime)
+            assert sd.yeardoy2datetime(yd, utsec) == t.astype(datetime.datetime)
         elif isinstance(t, str):
-            assert sd.yd2datetime(yd, utsec) == parse(t)
+            assert sd.yeardoy2datetime(yd, utsec) == parse(t)
         else:
-            assert sd.yd2datetime(yd, utsec).date() == t
+            assert sd.yeardoy2datetime(yd, utsec).date() == t
 
         assert utsec == utsec2
+# %% array
+    y, s = sd.datetime2yeardoy(Tdt)
+    assert_equal(sd.yeardoy2datetime(y, s), T[0])
 
 
 def test_date2doy():
     for t in T:
         doy, year = sd.date2doy(t)
 
-        if isinstance(t, np.datetime64):
-            t = t.astype(datetime.date)
-        elif isinstance(t, str):
-            t = parse(t)
-
-        assert year == t.year
+        assert year == T[0].year
         assert doy == 183
+# %% array
+    doy, year = sd.date2doy(Tdt)
+    assert_equal(year, T[0].year)
+    assert_equal(doy, 183)
 
 
 def test_yeardec():
@@ -54,10 +58,11 @@ def test_yeardec():
             assert sd.yeardec2datetime(yeardec) == t
         else:
             assert sd.yeardec2datetime(yeardec).date() == t
+# %% array
+    assert_equal(sd.yeardec2datetime(sd.datetime2yeardec(Tdt)), T[0])
 
 
 def test_utc():
-
     estdt = T[0].astimezone(timezone('EST'))
     utcdt = sd.forceutc(estdt)
 
