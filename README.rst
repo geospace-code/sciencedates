@@ -14,6 +14,11 @@
    :target: https://codeclimate.com/github/scivision/sciencedates/maintainability
    :alt: Maintainability
 
+.. image:: http://pepy.tech/badge/sciencedates
+   :target: http://pepy.tech/project/sciencedates
+   :alt: PyPi Download stats
+   
+
 ============
 sciencedates
 ============
