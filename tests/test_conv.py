@@ -3,8 +3,8 @@ import datetime
 from dateutil.parser import parse
 import numpy as np
 from pytz import timezone
-from numpy.testing import assert_allclose, assert_equal, run_module_suite
-#
+from numpy.testing import assert_allclose, assert_equal
+import pytest
 import sciencedates as sd
 #
 T = [datetime.datetime(2013, 7, 2, 12, 0, 0)]
@@ -82,22 +82,5 @@ def test_gtd():
     assert_allclose(stl, (14.8, 2.8, 14.8, 14.8))
 
 
-def test_findnearest():
-
-    indf, xf = sd.find_nearest([10, 15, 12, 20, 14, 33], [32, 12.01])
-    assert_allclose(indf, [5, 2])
-    assert_allclose(xf, [33., 12.])
-
-    indf, xf = sd.find_nearest((datetime.datetime(2012, 1, 1, 12),
-                                datetime.datetime(2012, 1, 1, 11)),
-                               datetime.datetime(2012, 1, 1, 11, 30))
-    assert_equal(indf, 0)
-    assert_equal(xf, datetime.datetime(2012, 1, 1, 12))
-
-
-def test_randomdate():
-    assert sd.randomdate(2018).year == 2018
-
-
 if __name__ == '__main__':
-    run_module_suite()
+    pytest.main()
