@@ -270,23 +270,6 @@ def find_nearest(x, x0) -> Tuple[int, Any]:
     return ind.squeeze()[()], x[ind].squeeze()[()]   # [()] to pop scalar from 0d array while being OK with ndim>0
 
 
-def INCORRECTRESULT_using_bisect(x, X0):  # pragma: no cover
-    X0 = np.atleast_1d(X0)
-    x.sort()
-    ind = [bisect(x, x0) for x0 in X0]
-
-    x = np.asanyarray(x)
-    return np.asanyarray(ind), x[ind]
-
-
-if __name__ == '__main__':
-    from bisect import bisect
-
-    print(find_nearest([10, 15, 12, 20, 14, 33], [32, 12.01]))
-
-    print(INCORRECTRESULT_using_bisect([10, 15, 12, 20, 14, 33], [32, 12.01]))
-
-
 def randomdate(year: int) -> datetime.date:
     """ gives random date in year"""
     if calendar.isleap(year):

@@ -89,7 +89,7 @@ def test_findnearest():
     assert_allclose(xf, [33., 12.])
 
     indf, xf = sd.find_nearest((datetime.datetime(2012, 1, 1, 12),
-                               datetime.datetime(2012, 1, 1, 11)),
+                                datetime.datetime(2012, 1, 1, 11)),
                                datetime.datetime(2012, 1, 1, 11, 30))
     assert_equal(indf, 0)
     assert_equal(xf, datetime.datetime(2012, 1, 1, 12))
