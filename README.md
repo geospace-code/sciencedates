@@ -5,7 +5,6 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/47852e6e896d404d20a5/maintainability)](https://codeclimate.com/github/scivision/sciencedates/maintainability)
 [![pypi format](https://img.shields.io/pypi/format/sciencedates.svg)](https://pypi.python.org/pypi/sciencedates)
 [![PyPi Download stats](http://pepy.tech/badge/sciencedates)](http://pepy.tech/project/sciencedates)
-[![PyPi Download stats](http://pepy.tech/badge/sciencedates)](http://pepy.tech/project/sciencedates)
 
 # Science Dates & Times
 
