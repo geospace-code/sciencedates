@@ -5,7 +5,7 @@ import numpy as np
 from dateutil.parser import parse
 import calendar
 import random
-from typing import Union, Tuple, Any
+from typing import Union, Tuple, Any, List
 
 
 def datetime2yeardoy(time: Union[str, datetime.datetime]) -> Tuple[int, float]:
@@ -89,8 +89,8 @@ def date2doy(time: Union[str, datetime.datetime]) -> Tuple[int, int]:
     return doy, year
 
 
-def datetime2gtd(time: Union[str, datetime.datetime],
-                 glon: float=np.nan) -> Tuple[int, float, float]:
+def datetime2gtd(time: Union[str, datetime.datetime, np.datetime64],
+                 glon: Union[float, List[float], np.ndarray]=np.nan) -> Tuple[int, float, float]:
     """
     Inputs:
     time: Numpy 1-D array of datetime.datetime OR string for dateutil.parser.parse
@@ -103,25 +103,28 @@ def datetime2gtd(time: Union[str, datetime.datetime],
     """
 # %%
     T = np.atleast_1d(time)
-    lon = np.atleast_2d(glon)
-    iyd = np.empty_like(T, int)
+    glon = np.asarray(glon)
+    doy = np.empty_like(T, int)
     utsec = np.empty_like(T, float)
-    stl = np.empty((T.size, lon.shape[0], lon.shape[1]))
+    stl = np.empty((T.size, *glon.shape))
 
     for i, t in enumerate(T):
         if isinstance(t, str):
             t = parse(t)
         elif isinstance(t, np.datetime64):
             t = t.astype(datetime.datetime)
-
-        iyd[i] = int(t.strftime('%j'))
-        # seconds since utc midnight
+        elif isinstance(t, (datetime.datetime, datetime.date)):
+            pass
+        else:
+            raise TypeError(f'unknown time datatype {type(t)}')
+# %% Day of year
+        doy[i] = int(t.strftime('%j'))
+# %% seconds since utc midnight
         utsec[i] = datetime2utsec(t)
 
-        # FIXME let's be sure this is appropriate
-        stl[i, ...] = utsec[i] / 3600 + lon / 15
+        stl[i, ...] = utsec[i] / 3600. + glon / 15.
 
-    return iyd, utsec, stl.squeeze()
+    return doy, utsec, stl
 
 
 def datetime2utsec(t: Union[str, datetime.date, datetime.datetime, np.datetime64]) -> float:

@@ -73,14 +73,5 @@ def test_utc():
     assert sd.forceutc(d) == d
 
 
-def test_gtd():
-
-    iyd, utsec, stl = sd.datetime2gtd(T, glon=42)
-
-    assert_allclose(iyd, 183)
-    assert_allclose(utsec, (43200, 0, 43200, 43200))
-    assert_allclose(stl, (14.8, 2.8, 14.8, 14.8))
-
-
 if __name__ == '__main__':
     pytest.main()
