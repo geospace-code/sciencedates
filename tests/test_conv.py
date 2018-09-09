@@ -2,10 +2,10 @@
 import datetime
 from dateutil.parser import parse
 import numpy as np
-from pytz import timezone
 from numpy.testing import assert_allclose, assert_equal
 import pytest
 import sciencedates as sd
+import sys
 #
 T = [datetime.datetime(2013, 7, 2, 12, 0, 0)]
 T.append(T[0].date())
@@ -13,6 +13,7 @@ T.append(np.datetime64(T[0]))
 T.append(str(T[0]))
 
 Tdt = (T[0],)*3
+OLDPY = sys.version_info < (3, 6)
 
 
 def test_yearint():
@@ -62,8 +63,11 @@ def test_yeardec():
     assert_equal(sd.yeardec2datetime(sd.datetime2yeardec(Tdt)), T[0])
 
 
+@pytest.mark.xfail(OLDPY, reason='py36+')
 def test_utc():
-    estdt = T[0].astimezone(timezone('EST'))
+    pytz = pytest.importorskip('pytz')
+
+    estdt = T[0].astimezone(pytz.timezone('EST'))
     utcdt = sd.forceutc(estdt)
 
     assert utcdt == estdt
@@ -72,6 +76,9 @@ def test_utc():
     d = T[0].date()
     assert sd.forceutc(d) == d
 
+
+if __name__ == '__main__':
+    pytest.main([__file__])
 
 if __name__ == '__main__':
     pytest.main()

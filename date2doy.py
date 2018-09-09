@@ -13,7 +13,7 @@ def main():
 
     doy, year = date2doy(P.date)
 
-    print(doy)
+    print(doy.item())
 
 
 if __name__ == '__main__':
