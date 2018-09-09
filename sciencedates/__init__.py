@@ -1,11 +1,15 @@
-from __future__ import division
 import datetime
-from pytz import UTC
 import numpy as np
 from dateutil.parser import parse
 import calendar
 import random
-from typing import Union, Tuple, Any, List
+from typing import Union, Tuple, List
+
+from .findnearest import find_nearest  # noqa: F401
+try:
+    from .tz import forceutc  # noqa: F401
+except ImportError:
+    pass
 
 
 def datetime2yeardoy(time: Union[str, datetime.datetime]) -> Tuple[int, float]:
@@ -17,7 +21,7 @@ def datetime2yeardoy(time: Union[str, datetime.datetime]) -> Tuple[int, float]:
     yd: yyyyddd four digit year, 3 digit day of year (INTEGER)
     utsec: seconds from midnight utc
     """
-    T: np.ndarray = np.atleast_1d(time)
+    T = np.atleast_1d(time)
 
     utsec = np.empty_like(T, float)
     yd = np.empty_like(T, int)
@@ -116,7 +120,7 @@ def datetime2gtd(time: Union[str, datetime.datetime, np.datetime64],
         elif isinstance(t, (datetime.datetime, datetime.date)):
             pass
         else:
-            raise TypeError(f'unknown time datatype {type(t)}')
+            raise TypeError('unknown time datatype {}'.format(type(t)))
 # %% Day of year
         doy[i] = int(t.strftime('%j'))
 # %% seconds since utc midnight
@@ -143,36 +147,6 @@ def datetime2utsec(t: Union[str, datetime.date, datetime.datetime, np.datetime64
 
     return datetime.timedelta.total_seconds(t - datetime.datetime.combine(t.date(),
                                                                           datetime.datetime.min.time()))
-
-
-def forceutc(t: Union[str, datetime.datetime, datetime.date, np.datetime64]) -> Union[datetime.datetime, datetime.date]:
-    """
-    Add UTC to datetime-naive and convert to UTC for datetime aware
-
-    input: python datetime (naive, utc, non-utc) or Numpy datetime64  #FIXME add Pandas and AstroPy time classes
-    output: utc datetime
-    """
-    # need to passthrough None for simpler external logic.
-# %% polymorph to datetime
-    if isinstance(t, str):
-        t = parse(t)
-    elif isinstance(t, np.datetime64):
-        t = t.astype(datetime.datetime)
-    elif isinstance(t, datetime.datetime):
-        pass
-    elif isinstance(t, datetime.date):
-        return t
-    elif isinstance(t, (np.ndarray, list, tuple)):
-        return np.asarray([forceutc(T) for T in t])
-    else:
-        raise TypeError('datetime only input')
-# %% enforce UTC on datetime
-    if t.tzinfo is None:  # datetime-naive
-        t = t.replace(tzinfo=UTC)
-    else:  # datetime-aware
-        t = t.astimezone(UTC)  # changes timezone, preserving absolute time. E.g. noon EST = 5PM UTC
-
-    return t
 
 
 def yeardec2datetime(atime: float) -> datetime.datetime:
@@ -223,7 +197,7 @@ def datetime2yeardec(time: Union[str, datetime.datetime, datetime.date]) -> floa
     elif isinstance(time, (tuple, list, np.ndarray)):
         return np.asarray([datetime2yeardec(t) for t in time])
     else:
-        raise TypeError(f'unknown input type {type(time)}')
+        raise TypeError('unknown input type {}'.format(type(time)))
 
     year = t.year
 
@@ -231,46 +205,6 @@ def datetime2yeardec(time: Union[str, datetime.datetime, datetime.date]) -> floa
     eoy = datetime.datetime(year + 1, 1, 1)
 
     return year + ((t - boy).total_seconds() / ((eoy - boy).total_seconds()))
-
-
-# %%
-def find_nearest(x, x0) -> Tuple[int, Any]:
-    """
-    This find_nearest function does NOT assume sorted input
-
-    inputs:
-    x: array (float, int, datetime, h5py.Dataset) within which to search for x0
-    x0: singleton or array of values to search for in x
-
-    outputs:
-    idx: index of flattened x nearest to x0  (i.e. works with higher than 1-D arrays also)
-    xidx: x[idx]
-
-    Observe how bisect.bisect() gives the incorrect result!
-
-    idea based on:
-    http://stackoverflow.com/questions/2566412/find-nearest-value-in-numpy-array
-
-    """
-    x = np.asanyarray(x)  # for indexing upon return
-    x0 = np.atleast_1d(x0)
-# %%
-    if x.size == 0 or x0.size == 0:
-        raise ValueError('empty input(s)')
-
-    if x0.ndim not in (0, 1):
-        raise ValueError('2-D x0 not handled yet')
-# %%
-    ind = np.empty_like(x0, dtype=int)
-
-    # NOTE: not trapping IndexError (all-nan) becaues returning None can surprise with slice indexing
-    for i, xi in enumerate(x0):
-        if xi is not None and (isinstance(xi, (datetime.datetime, datetime.date, np.datetime64)) or np.isfinite(xi)):
-            ind[i] = np.nanargmin(abs(x-xi))
-        else:
-            raise ValueError('x0 must NOT be None or NaN to avoid surprising None return value')
-
-    return ind.squeeze()[()], x[ind].squeeze()[()]   # [()] to pop scalar from 0d array while being OK with ndim>0
 
 
 def randomdate(year: int) -> datetime.date:

@@ -10,8 +10,7 @@
 # Science Dates & Times
 
 Date & time conversions used in the sciences. 
-The assumption is that datetimes are timezone-naive, as this will be required soon in Numpy *et al* for
-`numpy.datetime64`.
+The assumption is that datetimes are timezone-naive, as this is required in Numpy *et al* for `numpy.datetime64`.
 
 
 ## Install

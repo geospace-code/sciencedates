@@ -2,7 +2,7 @@
 #=
 command-line utility to convert date to day of year
 =#
-using Base.Dates
+using Dates
 using ArgParse
 
 
