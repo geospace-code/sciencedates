@@ -38,7 +38,7 @@ def datetime2yeardoy(time: Union[str, datetime.datetime]) -> Tuple[int, float]:
 
 
 def yeardoy2datetime(yeardate: int,
-                     utsec: Union[float, int]=None) -> datetime.datetime:
+                     utsec: Union[float, int] = None) -> datetime.datetime:
     """
     Inputs:
     yd: yyyyddd four digit year, 3 digit day of year (INTEGER 7 digits)
@@ -94,7 +94,7 @@ def date2doy(time: Union[str, datetime.datetime]) -> Tuple[int, int]:
 
 
 def datetime2gtd(time: Union[str, datetime.datetime, np.datetime64],
-                 glon: Union[float, List[float], np.ndarray]=np.nan) -> Tuple[int, float, float]:
+                 glon: Union[float, List[float], np.ndarray] = np.nan) -> Tuple[int, float, float]:
     """
     Inputs:
     time: Numpy 1-D array of datetime.datetime OR string for dateutil.parser.parse
