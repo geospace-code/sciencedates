@@ -1,7 +1,5 @@
 function doy = date2doy(adate)
 
-validateattributes(adate, {'char'}, {'vector'})
-
 v = datevec(adate);
 n = datenum(v);
 
