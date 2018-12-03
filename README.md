@@ -14,7 +14,9 @@ The assumption is that datetimes are **timezone-naive**, as this is required in 
 
 ## Install
 
-    python -m pip install -e .
+```sh
+python -m pip install -e .
+```
 
 ## Usage
 
@@ -30,3 +32,18 @@ yeardoy, utsec = sd.datetime2yd(T)
 Results in year,DayOfYear; UTC fraction of day [seconds]
 
 > (2013102, 72000.0)
+
+
+## Julia
+
+Julia [examples](./julia) are provided
+
+## Matlab / GNU Octave
+
+Matlab / GNU Octave [examples](./matlab) are provided
+
+## Fortran
+
+Fortran [examples](./fortran) are provided.
+For Python-like modern Fortran datetime, see 
+[Datetime-Fortran](https://github.com/wavebitscientific/datetime-fortran).
