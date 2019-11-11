@@ -1,21 +1,19 @@
 [![image](https://zenodo.org/badge/81351748.svg)](https://zenodo.org/badge/latestdoi/81351748)
-[![image](https://travis-ci.org/scivision/sciencedates.svg?branch=master)](https://travis-ci.org/scivision/sciencedates)
-[![image](https://coveralls.io/repos/github/scivision/sciencedates/badge.svg?branch=master)](https://coveralls.io/github/scivision/sciencedates?branch=master)
-[![image](https://ci.appveyor.com/api/projects/status/r6adn3fdvk1qcx4r?svg=true)](https://ci.appveyor.com/project/scivision/sciencedates)
-[![Maintainability](https://api.codeclimate.com/v1/badges/47852e6e896d404d20a5/maintainability)](https://codeclimate.com/github/scivision/sciencedates/maintainability)
+[![Actions Status](https://github.com/scivision/sciencedates/workflows/ci/badge.svg)](https://github.com/scivision/sciencedates/actions)
+
 [![Python versions (PyPI)](https://img.shields.io/pypi/pyversions/sciencedates.svg)](https://pypi.python.org/pypi/sciencedates)
 [![PyPi Download stats](http://pepy.tech/badge/sciencedates)](http://pepy.tech/project/sciencedates)
 
 # Science Dates & Times
 
-Date & time conversions used in the sciences. 
+Date & time conversions used in the sciences.
 The assumption is that datetimes are **timezone-naive**, as this is required in Numpy *et al* for `numpy.datetime64`.
 
 
 ## Install
 
 ```sh
-python -m pip install -e .
+python -m pip install sciencedates
 ```
 
 ## Usage
@@ -45,5 +43,5 @@ Matlab / GNU Octave [examples](./matlab) are provided
 ## Fortran
 
 Fortran [examples](./fortran) are provided.
-For Python-like modern Fortran datetime, see 
+For Python-like modern Fortran datetime, see
 [Datetime-Fortran](https://github.com/wavebitscientific/datetime-fortran).

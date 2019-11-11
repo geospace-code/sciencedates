@@ -13,7 +13,7 @@ def forceutc(t: Union[str, datetime.datetime, datetime.date, np.datetime64]) -> 
     output: utc datetime
     """
     # need to passthrough None for simpler external logic.
-# %% polymorph to datetime
+    # %% polymorph to datetime
     if isinstance(t, str):
         t = parse(t)
     elif isinstance(t, np.datetime64):
@@ -26,7 +26,7 @@ def forceutc(t: Union[str, datetime.datetime, datetime.date, np.datetime64]) -> 
         return np.asarray([forceutc(T) for T in t])
     else:
         raise TypeError('datetime only input')
-# %% enforce UTC on datetime
+    # %% enforce UTC on datetime
     if t.tzinfo is None:  # datetime-naive
         t = t.replace(tzinfo=UTC)
     else:  # datetime-aware

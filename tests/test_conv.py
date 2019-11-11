@@ -2,17 +2,18 @@
 import datetime
 from dateutil.parser import parse
 import numpy as np
-from numpy.testing import assert_allclose, assert_equal
+from pytest import approx
 import pytest
-import sciencedates as sd
 import sys
-#
-T = [datetime.datetime(2013, 7, 2, 12, 0, 0)]
+import typing
+import sciencedates as sd
+
+T: typing.List[typing.Any] = [datetime.datetime(2013, 7, 2, 12, 0, 0)]
 T.append(T[0].date())
 T.append(np.datetime64(T[0]))
 T.append(str(T[0]))
 
-Tdt = (T[0],)*3
+Tdt = (T[0],) * 3
 OLDPY = sys.version_info < (3, 6)
 
 
@@ -33,9 +34,9 @@ def test_yearint():
             assert sd.yeardoy2datetime(yd, utsec).date() == t
 
         assert utsec == utsec2
-# %% array
+    # %% array
     y, s = sd.datetime2yeardoy(Tdt)
-    assert_equal(sd.yeardoy2datetime(y, s), T[0])
+    assert (sd.yeardoy2datetime(y, s) == T[0]).all()
 
 
 def test_date2doy():
@@ -44,26 +45,26 @@ def test_date2doy():
 
         assert year == T[0].year
         assert doy == 183
-# %% array
+    # %% array
     doy, year = sd.date2doy(Tdt)
-    assert_equal(year, T[0].year)
-    assert_equal(doy, 183)
+    assert (year == T[0].year).all()
+    assert (doy == 183).all()
 
 
 def test_yeardec():
     for t, r in zip(T, (2013.5, 2013.4986301369863)):
         yeardec = sd.datetime2yeardec(t)
 
-        assert_allclose(yeardec, r)
+        assert yeardec == approx(r)
         if isinstance(t, datetime.datetime):
             assert sd.yeardec2datetime(yeardec) == t
         else:
             assert sd.yeardec2datetime(yeardec).date() == t
-# %% array
-    assert_equal(sd.yeardec2datetime(sd.datetime2yeardec(Tdt)), T[0])
+    # %% array
+    assert (sd.yeardec2datetime(sd.datetime2yeardec(Tdt)) == T[0]).all()
 
 
-@pytest.mark.xfail(OLDPY, reason='py36+')
+@pytest.mark.skip(OLDPY, reason='py36+')
 def test_utc():
     pytz = pytest.importorskip('pytz')
 
@@ -79,6 +80,3 @@ def test_utc():
 
 if __name__ == '__main__':
     pytest.main([__file__])
-
-if __name__ == '__main__':
-    pytest.main()

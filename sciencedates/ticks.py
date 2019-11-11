@@ -49,4 +49,4 @@ def timeticks(tdiff):
         return SecondLocator(bysecond=range(0, 60, 10)), SecondLocator(bysecond=range(0, 60, 2))
 
     else:
-        return SecondLocator(bysecond=range(0, 60, 2)),  SecondLocator(bysecond=range(0, 60, 1))
+        return SecondLocator(bysecond=range(0, 60, 2)), SecondLocator(bysecond=range(0, 60, 1))

@@ -1,21 +1,22 @@
-#!/usr/bin/env python
-import sciencedates as sd
-import numpy.testing as npt
+#!/usr/bin/env python3
 import datetime
 import pytest
+from pytest import approx
+
+import sciencedates as sd
 
 
 def test_findnearest():
 
     indf, xf = sd.find_nearest([10, 15, 12, 20, 14, 33], [32, 12.01])
-    npt.assert_allclose(indf, [5, 2])
-    npt.assert_allclose(xf, [33., 12.])
+    assert (indf == [5, 2]).all()
+    assert xf == approx([33.0, 12.0])
 
-    indf, xf = sd.find_nearest((datetime.datetime(2012, 1, 1, 12),
-                                datetime.datetime(2012, 1, 1, 11)),
-                               datetime.datetime(2012, 1, 1, 11, 30))
-    npt.assert_equal(indf, 0)
-    npt.assert_equal(xf, datetime.datetime(2012, 1, 1, 12))
+    indf, xf = sd.find_nearest(
+        (datetime.datetime(2012, 1, 1, 12), datetime.datetime(2012, 1, 1, 11)), datetime.datetime(2012, 1, 1, 11, 30)
+    )
+    assert indf == 0
+    assert xf == datetime.datetime(2012, 1, 1, 12)
 
 
 def test_randomdate():

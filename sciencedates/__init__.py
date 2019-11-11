@@ -6,6 +6,7 @@ import random
 from typing import Union, Tuple, List
 
 from .findnearest import find_nearest  # noqa: F401
+
 try:
     from .tz import forceutc  # noqa: F401
 except ImportError:
@@ -32,13 +33,12 @@ def datetime2yeardoy(time: Union[str, datetime.datetime]) -> Tuple[int, float]:
             t = parse(t)
 
         utsec[i] = datetime2utsec(t)
-        yd[i] = t.year*1000 + int(t.strftime('%j'))
+        yd[i] = t.year * 1000 + int(t.strftime('%j'))
 
     return yd.squeeze()[()], utsec.squeeze()[()]
 
 
-def yeardoy2datetime(yeardate: int,
-                     utsec: Union[float, int] = None) -> datetime.datetime:
+def yeardoy2datetime(yeardate: int, utsec: Union[float, int] = None) -> datetime.datetime:
     """
     Inputs:
     yd: yyyyddd four digit year, 3 digit day of year (INTEGER 7 digits)
@@ -93,8 +93,9 @@ def date2doy(time: Union[str, datetime.datetime]) -> Tuple[int, int]:
     return doy, year
 
 
-def datetime2gtd(time: Union[str, datetime.datetime, np.datetime64],
-                 glon: Union[float, List[float], np.ndarray] = np.nan) -> Tuple[int, float, float]:
+def datetime2gtd(
+    time: Union[str, datetime.datetime, np.datetime64], glon: Union[float, List[float], np.ndarray] = np.nan
+) -> Tuple[int, float, float]:
     """
     Inputs:
     time: Numpy 1-D array of datetime.datetime OR string for dateutil.parser.parse
@@ -105,7 +106,7 @@ def datetime2gtd(time: Union[str, datetime.datetime, np.datetime64],
     utsec: seconds from midnight utc
     stl: local solar time
     """
-# %%
+    # %%
     T = np.atleast_1d(time)
     glon = np.asarray(glon)
     doy = np.empty_like(T, int)
@@ -121,12 +122,12 @@ def datetime2gtd(time: Union[str, datetime.datetime, np.datetime64],
             pass
         else:
             raise TypeError('unknown time datatype {}'.format(type(t)))
-# %% Day of year
+        # %% Day of year
         doy[i] = int(t.strftime('%j'))
-# %% seconds since utc midnight
+        # %% seconds since utc midnight
         utsec[i] = datetime2utsec(t)
 
-        stl[i, ...] = utsec[i] / 3600. + glon / 15.
+        stl[i, ...] = utsec[i] / 3600.0 + glon / 15.0
 
     return doy, utsec, stl
 
@@ -139,14 +140,13 @@ def datetime2utsec(t: Union[str, datetime.date, datetime.datetime, np.datetime64
     if isinstance(t, (tuple, list, np.ndarray)):
         return np.asarray([datetime2utsec(T) for T in t])
     elif isinstance(t, datetime.date) and not isinstance(t, datetime.datetime):
-        return 0.
+        return 0.0
     elif isinstance(t, np.datetime64):
         t = t.astype(datetime.datetime)
     elif isinstance(t, str):
         t = parse(t)
 
-    return datetime.timedelta.total_seconds(t - datetime.datetime.combine(t.date(),
-                                                                          datetime.datetime.min.time()))
+    return datetime.timedelta.total_seconds(t - datetime.datetime.combine(t.date(), datetime.datetime.min.time()))
 
 
 def yeardec2datetime(atime: float) -> datetime.datetime:
@@ -161,7 +161,7 @@ def yeardec2datetime(atime: float) -> datetime.datetime:
     In Python, go from decimal year (YYYY.YYY) to datetime,
     and from datetime to decimal year.
     """
-# %%
+    # %%
     if isinstance(atime, (float, int)):  # typically a float
 
         year = int(atime)
