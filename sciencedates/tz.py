@@ -25,7 +25,7 @@ def forceutc(t: Union[str, datetime.datetime, datetime.date, np.datetime64]) -> 
     elif isinstance(t, (np.ndarray, list, tuple)):
         return np.asarray([forceutc(T) for T in t])
     else:
-        raise TypeError('datetime only input')
+        raise TypeError("datetime only input")
     # %% enforce UTC on datetime
     if t.tzinfo is None:  # datetime-naive
         t = t.replace(tzinfo=UTC)

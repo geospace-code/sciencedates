@@ -7,8 +7,8 @@ from sciencedates import date2doy
 
 
 def main():
-    p = ArgumentParser(description='convert date to day of year')
-    p.add_argument('date', help='yyyy-mm-dd')
+    p = ArgumentParser(description="convert date to day of year")
+    p.add_argument("date", help="yyyy-mm-dd")
     P = p.parse_args()
 
     doy, year = date2doy(P.date)
@@ -16,5 +16,5 @@ def main():
     print(doy.item())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

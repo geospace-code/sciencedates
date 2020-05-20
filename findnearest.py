@@ -19,5 +19,5 @@ def main():
     print(INCORRECTRESULT_using_bisect([10, 15, 12, 20, 14, 33], [32, 12.01]))
 
 
-if __name__ == '__main__':  # pragma: no cover
+if __name__ == "__main__":  # pragma: no cover
     main()

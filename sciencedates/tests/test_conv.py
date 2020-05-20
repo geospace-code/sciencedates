@@ -64,19 +64,19 @@ def test_yeardec():
     assert (sd.yeardec2datetime(sd.datetime2yeardec(Tdt)) == T[0]).all()
 
 
-@pytest.mark.skip(OLDPY, reason='py36+')
+@pytest.mark.skip(OLDPY, reason="This test for Python < 3.6")
 def test_utc():
-    pytz = pytest.importorskip('pytz')
+    pytz = pytest.importorskip("pytz")
 
-    estdt = T[0].astimezone(pytz.timezone('EST'))
+    estdt = T[0].astimezone(pytz.timezone("EST"))
     utcdt = sd.forceutc(estdt)
 
     assert utcdt == estdt
-    assert utcdt.tzname() == 'UTC'
+    assert utcdt.tzname() == "UTC"
 
     d = T[0].date()
     assert sd.forceutc(d) == d
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     pytest.main([__file__])

@@ -6,7 +6,7 @@ from matplotlib.dates import DateFormatter
 from matplotlib.dates import MinuteLocator, SecondLocator
 
 
-def tickfix(t, fg, ax, tfmt: str = '%H:%M:%S'):
+def tickfix(t, fg, ax, tfmt: str = "%H:%M:%S"):
     majtick, mintick = timeticks(t[-1] - t[0])
     if majtick:
         ax.xaxis.set_major_locator(majtick)
@@ -15,7 +15,7 @@ def tickfix(t, fg, ax, tfmt: str = '%H:%M:%S'):
     ax.xaxis.set_major_formatter(DateFormatter(tfmt))
     fg.autofmt_xdate()
 
-    ax.autoscale(True, 'x', tight=True)
+    ax.autoscale(True, "x", tight=True)
 
     # ax.tick_params(axis='both',which='both')
     # ax.grid(True,which='both')
@@ -26,9 +26,9 @@ def timeticks(tdiff):
     NOTE do NOT use "interval" or ticks are misaligned!  use "bysecond" only!
     """
     if isinstance(tdiff, xarray.DataArray):  # len==1
-        tdiff = timedelta(seconds=tdiff.values / np.timedelta64(1, 's'))
+        tdiff = timedelta(seconds=tdiff.values / np.timedelta64(1, "s"))
 
-    assert isinstance(tdiff, timedelta), 'expecting datetime.timedelta'
+    assert isinstance(tdiff, timedelta), "expecting datetime.timedelta"
 
     if tdiff > timedelta(hours=2):
         return None, None

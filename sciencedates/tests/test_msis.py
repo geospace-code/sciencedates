@@ -80,5 +80,5 @@ def test_glon():
     assert stl == approx(Estl)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     pytest.main([__file__])

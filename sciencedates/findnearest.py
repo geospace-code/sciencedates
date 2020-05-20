@@ -25,10 +25,10 @@ def find_nearest(x, x0) -> Tuple[int, Any]:
     x0 = np.atleast_1d(x0)
     # %%
     if x.size == 0 or x0.size == 0:
-        raise ValueError('empty input(s)')
+        raise ValueError("empty input(s)")
 
     if x0.ndim not in (0, 1):
-        raise ValueError('2-D x0 not handled yet')
+        raise ValueError("2-D x0 not handled yet")
     # %%
     ind = np.empty_like(x0, dtype=int)
 
@@ -37,6 +37,6 @@ def find_nearest(x, x0) -> Tuple[int, Any]:
         if xi is not None and (isinstance(xi, (datetime.datetime, datetime.date, np.datetime64)) or np.isfinite(xi)):
             ind[i] = np.nanargmin(abs(x - xi))
         else:
-            raise ValueError('x0 must NOT be None or NaN to avoid surprising None return value')
+            raise ValueError("x0 must NOT be None or NaN to avoid surprising None return value")
 
     return ind.squeeze()[()], x[ind].squeeze()[()]  # [()] to pop scalar from 0d array while being OK with ndim>0
