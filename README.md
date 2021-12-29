@@ -1,10 +1,9 @@
+# Science Dates & Times
+
 [![image](https://zenodo.org/badge/81351748.svg)](https://zenodo.org/badge/latestdoi/81351748)
 [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/scivision/sciencedates.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/scivision/sciencedates/context:python)
 [![Actions Status](https://github.com/scivision/sciencedates/workflows/ci/badge.svg)](https://github.com/scivision/sciencedates/actions)
-[![Python versions (PyPI)](https://img.shields.io/pypi/pyversions/sciencedates.svg)](https://pypi.python.org/pypi/sciencedates)
 [![PyPi Download stats](http://pepy.tech/badge/sciencedates)](http://pepy.tech/project/sciencedates)
-
-# Science Dates & Times
 
 Date & time conversions used in the sciences.
 The assumption is that datetimes are **timezone-naive**, as this is required in Numpy *et al* for `numpy.datetime64`.
