@@ -1,9 +1,10 @@
-from typing import Tuple, Any
+from __future__ import annotations
+import typing as T
 import numpy as np
 import datetime
 
 
-def find_nearest(x, x0) -> Tuple[int, Any]:
+def find_nearest(x, x0) -> tuple[int, T.Any]:
     """
     This find_nearest function does NOT assume sorted input
 
@@ -34,9 +35,14 @@ def find_nearest(x, x0) -> Tuple[int, Any]:
 
     # NOTE: not trapping IndexError (all-nan) becaues returning None can surprise with slice indexing
     for i, xi in enumerate(x0):
-        if xi is not None and (isinstance(xi, (datetime.datetime, datetime.date, np.datetime64)) or np.isfinite(xi)):
+        if xi is not None and (
+            isinstance(xi, (datetime.datetime, datetime.date, np.datetime64)) or np.isfinite(xi)
+        ):
             ind[i] = np.nanargmin(abs(x - xi))
         else:
             raise ValueError("x0 must NOT be None or NaN to avoid surprising None return value")
 
-    return ind.squeeze()[()], x[ind].squeeze()[()]  # [()] to pop scalar from 0d array while being OK with ndim>0
+    return (
+        ind.squeeze()[()],
+        x[ind].squeeze()[()],
+    )  # [()] to pop scalar from 0d array while being OK with ndim>0

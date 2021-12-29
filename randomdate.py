@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 generate a random date (month and day) in a year.
 Michael Hirsch, Ph.D.
@@ -8,13 +8,8 @@ from datetime import date
 from sciencedates import randomdate
 
 
-def main():
-    p = ArgumentParser(description="generate random date in year")
-    p.add_argument("year", type=int, nargs="?", default=date.today().year)
-    P = p.parse_args()
+p = ArgumentParser(description="generate random date in year")
+p.add_argument("year", type=int, nargs="?", default=date.today().year)
+P = p.parse_args()
 
-    print(randomdate(P.year))
-
-
-if __name__ == "__main__":
-    main()
+print(randomdate(P.year))

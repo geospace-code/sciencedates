@@ -1,20 +1,19 @@
-#!/usr/bin/env python
+from __future__ import annotations
 import datetime
 from dateutil.parser import parse
+import typing
+
 import numpy as np
 from pytest import approx
-import pytest
-import sys
-import typing
+
 import sciencedates as sd
 
-T: typing.List[typing.Any] = [datetime.datetime(2013, 7, 2, 12, 0, 0)]
+T: list[typing.Any] = [datetime.datetime(2013, 7, 2, 12, 0, 0)]
 T.append(T[0].date())
 T.append(np.datetime64(T[0]))
 T.append(str(T[0]))
 
 Tdt = (T[0],) * 3
-OLDPY = sys.version_info < (3, 6)
 
 
 def test_yearint():
@@ -62,21 +61,3 @@ def test_yeardec():
             assert sd.yeardec2datetime(yeardec).date() == t
     # %% array
     assert (sd.yeardec2datetime(sd.datetime2yeardec(Tdt)) == T[0]).all()
-
-
-@pytest.mark.skip(OLDPY, reason="This test for Python < 3.6")
-def test_utc():
-    pytz = pytest.importorskip("pytz")
-
-    estdt = T[0].astimezone(pytz.timezone("EST"))
-    utcdt = sd.forceutc(estdt)
-
-    assert utcdt == estdt
-    assert utcdt.tzname() == "UTC"
-
-    d = T[0].date()
-    assert sd.forceutc(d) == d
-
-
-if __name__ == "__main__":
-    pytest.main([__file__])

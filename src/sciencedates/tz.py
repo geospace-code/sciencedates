@@ -1,11 +1,13 @@
-from typing import Union
-import numpy as np
+from __future__ import annotations
+import typing as T
 import datetime
 from pytz import UTC
 from dateutil.parser import parse
 
+import numpy as np
 
-def forceutc(t: Union[str, datetime.datetime, datetime.date, np.datetime64]) -> Union[datetime.datetime, datetime.date]:
+
+def forceutc(t: T.Any) -> datetime.datetime | datetime.date | np.ndarray:
     """
     Add UTC to datetime-naive and convert to UTC for datetime aware
 
@@ -30,6 +32,7 @@ def forceutc(t: Union[str, datetime.datetime, datetime.date, np.datetime64]) -> 
     if t.tzinfo is None:  # datetime-naive
         t = t.replace(tzinfo=UTC)
     else:  # datetime-aware
-        t = t.astimezone(UTC)  # changes timezone, preserving absolute time. E.g. noon EST = 5PM UTC
+        t = t.astimezone(UTC)
+        # changes timezone, preserving absolute time. E.g. noon EST = 5PM UTC
 
     return t

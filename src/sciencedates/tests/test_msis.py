@@ -1,16 +1,17 @@
-#!/usr/bin/env python
 """
 tests for time conversions relevant to MSISE00
 """
-import numpy as np
+
+from __future__ import annotations
 import datetime
-import pytest
-from pytest import approx
 import typing
+
+import numpy as np
+from pytest import approx
 
 import sciencedates as sd
 
-T: typing.List[typing.Any] = [datetime.datetime(2013, 7, 2, 12, 0, 0)]
+T: list[typing.Any] = [datetime.datetime(2013, 7, 2, 12, 0, 0)]
 T.append(T[0].date())
 T.append(np.datetime64(T[0]))
 T.append(str(T[0]))
@@ -74,11 +75,14 @@ def test_glon():
 
     iyd, utsec, stl = sd.datetime2gtd(T, glon)
 
-    Estl = np.array([np.arange(0, 24 + 3, 3), np.arange(-12, 12 + 3, 3), np.arange(0, 24 + 3, 3), np.arange(0, 24 + 3, 3)])
+    Estl = np.array(
+        [
+            np.arange(0, 24 + 3, 3),
+            np.arange(-12, 12 + 3, 3),
+            np.arange(0, 24 + 3, 3),
+            np.arange(0, 24 + 3, 3),
+        ]
+    )
 
     assert utsec == approx((43200, 0, 43200, 43200))
     assert stl == approx(Estl)
-
-
-if __name__ == "__main__":
-    pytest.main([__file__])

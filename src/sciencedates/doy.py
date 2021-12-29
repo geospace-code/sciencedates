@@ -1,3 +1,4 @@
+from __future__ import annotations
 import typing as T
 import datetime
 import numpy as np
@@ -8,7 +9,7 @@ from .dec import datetime2utsec
 __all__ = ["datetime2yeardoy", "yeardoy2datetime", "date2doy", "datetime2gtd"]
 
 
-def datetime2yeardoy(time: T.Union[str, datetime.datetime]) -> T.Tuple[int, float]:
+def datetime2yeardoy(time: T.Any) -> tuple[int, float]:
     """
     Inputs:
     T: Numpy 1-D array of datetime.datetime OR string for dateutil.parser.parse
@@ -33,7 +34,7 @@ def datetime2yeardoy(time: T.Union[str, datetime.datetime]) -> T.Tuple[int, floa
     return yd.squeeze()[()], utsec.squeeze()[()]
 
 
-def yeardoy2datetime(yeardate: int, utsec: T.Union[float, int] = None) -> datetime.datetime:
+def yeardoy2datetime(yeardate: int, utsec: float | int = 0) -> datetime.datetime:
     """
 
     Parameters
@@ -51,10 +52,10 @@ def yeardoy2datetime(yeardate: int, utsec: T.Union[float, int] = None) -> dateti
     http://stackoverflow.com/questions/2427555/python-question-year-and-day-of-year-to-date
     """
     if isinstance(yeardate, (tuple, list, np.ndarray)):
-        if utsec is None:
-            return np.asarray([yeardoy2datetime(y) for y in yeardate])
-        elif isinstance(utsec, (tuple, list, np.ndarray)):
+        if isinstance(utsec, (tuple, list, np.ndarray)):
             return np.asarray([yeardoy2datetime(y, s) for y, s in zip(yeardate, utsec)])
+        else:
+            return np.asarray([yeardoy2datetime(y, utsec) for y in yeardate])
 
     yeardate = int(yeardate)
 
@@ -65,15 +66,16 @@ def yeardoy2datetime(yeardate: int, utsec: T.Union[float, int] = None) -> dateti
     year = int(yd[:4])
     assert 0 < year < 3000, "year not in expected format"
 
-    dt = datetime.datetime(year, 1, 1) + datetime.timedelta(days=int(yd[4:]) - 1)
-
-    if utsec is not None:
-        dt += datetime.timedelta(seconds=utsec)
+    dt = (
+        datetime.datetime(year, 1, 1)
+        + datetime.timedelta(days=int(yd[4:]) - 1)
+        + datetime.timedelta(seconds=utsec)
+    )
 
     return dt
 
 
-def date2doy(time: T.Union[str, datetime.datetime]) -> T.Tuple[int, int]:
+def date2doy(time: T.Any) -> tuple[np.ndarray, np.ndarray]:
     """
     < 366 for leap year too. normal year 0..364.  Leap 0..365.
     """
@@ -94,7 +96,9 @@ def date2doy(time: T.Union[str, datetime.datetime]) -> T.Tuple[int, int]:
     return doy, year
 
 
-def datetime2gtd(time: T.Union[str, datetime.datetime, np.datetime64], glon: np.ndarray = np.nan) -> T.Tuple[int, float, float]:
+def datetime2gtd(
+    time: T.Any, glon: float | np.ndarray = np.nan
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
 
     Parameters

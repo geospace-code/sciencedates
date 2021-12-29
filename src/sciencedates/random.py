@@ -4,7 +4,7 @@ import datetime
 
 
 def randomdate(year: int) -> datetime.date:
-    """ gives random date in year"""
+    """gives random date in year"""
     if calendar.isleap(year):
         doy = random.randrange(366)
     else:

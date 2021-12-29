@@ -1,12 +1,14 @@
+from __future__ import annotations
 import typing as T
-import numpy as np
 import datetime
 import dateutil.parser
+import numpy as np
+
 
 __all__ = ["datetime2utsec", "datetime2yeardec", "yeardec2datetime"]
 
 
-def datetime2utsec(t: T.Union[str, datetime.date, datetime.datetime, np.datetime64]) -> float:
+def datetime2utsec(t: T.Any) -> float | np.ndarray:
     """
     input: datetime
     output: float utc seconds since THIS DAY'S MIDNIGHT
@@ -20,7 +22,9 @@ def datetime2utsec(t: T.Union[str, datetime.date, datetime.datetime, np.datetime
     elif isinstance(t, str):
         t = dateutil.parser.parse(t)
 
-    return datetime.timedelta.total_seconds(t - datetime.datetime.combine(t.date(), datetime.datetime.min.time()))
+    return datetime.timedelta.total_seconds(
+        t - datetime.datetime.combine(t.date(), datetime.datetime.min.time())
+    )
 
 
 def yeardec2datetime(atime: float) -> datetime.datetime:
@@ -54,7 +58,7 @@ def yeardec2datetime(atime: float) -> datetime.datetime:
     return time
 
 
-def datetime2yeardec(time: T.Union[str, datetime.datetime, datetime.date]) -> float:
+def datetime2yeardec(time: str | datetime.datetime | datetime.date) -> float:
     """
     Convert a datetime into a float. The integer part of the float should
     represent the year.
